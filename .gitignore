@@ -1,0 +1,9 @@
+.env
+data/
+simulator-downloads/
+device.json
+*.sqlite*
+*.log
+.sites-runtime/
+__pycache__/
+*.pyc

@@ -1,0 +1,24 @@
+services:
+  panel:
+    build: .
+    restart: unless-stopped
+    init: true
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:?Run setup first}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?Run setup first}
+      TRUST_PROXY: "1"
+      BYTEDEPP_DB: /source/bytedepp.sqlite3
+    ports:
+      - "127.0.0.1:3080:3080"
+    volumes:
+      - fleet_data:/app/data
+      - /srv/bytedepp/bytedepp.sqlite3:/source/bytedepp.sqlite3:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  fleet_data:

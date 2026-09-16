@@ -1,0 +1,8 @@
+.env
+.git
+.sites-runtime
+data
+test
+*.zip
+device.json
+simulator-downloads
