@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readByteDepp } from './bytedepp.mjs';
+import { createAppointments } from './appointments.mjs';
 
 const scrypt=promisify(scryptCallback),here=dirname(fileURLToPath(import.meta.url));
 const sha=value=>createHash('sha256').update(value).digest('hex');
@@ -43,6 +44,7 @@ export async function createApp(config={}){
   for(const [name,type] of [['client_id','TEXT REFERENCES clients(id)'],['byte_device_id','TEXT'],['linked_at','INTEGER']])if(!all('PRAGMA table_info(vehicles)').some(c=>c.name===name))db.exec(`ALTER TABLE vehicles ADD COLUMN ${name} ${type}`);
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS one_bytedepp_device ON vehicles(byte_device_id) WHERE byte_device_id IS NOT NULL');
   const audit=(actor,action,target)=>run('INSERT INTO events(actor,action,target,created_at) VALUES(?,?,?,?)',actor,action,target,now());
+  const appointments=createAppointments(db,audit);
   function selectedClient(value){
     if(value===undefined||value===null||value==='')return null;
     const account=one('SELECT id,email FROM clients WHERE id=?',field(value,'Клиент',36));
@@ -83,6 +85,8 @@ export async function createApp(config={}){
       const path=new URL(req.url,'http://localhost').pathname,method=req.method;
       if(path==='/health'&&method==='GET')return send(200,{ok:true});
       const assets={'/':['client.html','text/html'],'/client':['client.html','text/html'],'/admin':['index.html','text/html'],'/client.js':['client.js','text/javascript'],'/client.css':['client.css','text/css'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/favicon.svg':['favicon.svg','image/svg+xml']};
+      for(const file of ['service-catalog.js','appointments-ui.js'])assets['/'+file]=[file,'text/javascript'];
+      assets['/appointments.css']=['appointments.css','text/css'];
       if(assets[path]&&method==='GET'){const[file,type]=assets[path];res.setHeader('Content-Type',type+'; charset=utf-8');return res.end(await readFile(join(here,'public',file)));}
       if(path==='/api/login'&&method==='POST'){
         origin(req);limit('admin:'+remoteIp(req),15,15*60000);const b=await json(req);const password=field(b.password,'Пароль',512);const actual=await scrypt(password,salt,64);
@@ -108,8 +112,11 @@ export async function createApp(config={}){
         const user=client(req);
         if(path==='/api/client/logout'&&method==='POST'){run('DELETE FROM client_sessions WHERE hash=?',sha(user.session));res.setHeader('Set-Cookie',cookie('fleet_client_session','',0));return send(200,{ok:true});}
         if(path==='/api/client/state'&&method==='GET'){
-          const byte=readByteDepp(bytePath);return send(200,{client:{id:user.id,name:user.name,email:user.email},vehicles:cars(all('SELECT * FROM vehicles WHERE client_id=? ORDER BY created_at DESC',user.id),byte),integration_available:byte.connected});
+          const byte=readByteDepp(bytePath);return send(200,{client:{id:user.id,name:user.name,email:user.email},vehicles:cars(all('SELECT * FROM vehicles WHERE client_id=? ORDER BY created_at DESC',user.id),byte),appointments:appointments.list(user.id),integration_available:byte.connected});
         }
+        if(path==='/api/client/appointments'&&method==='POST'){const result=appointments.create(user,await json(req));return send(result.replayed?200:201,result);}
+        const cancellation=path.match(/^\/api\/client\/appointments\/([0-9a-f-]{36})\/cancel$/);
+        if(cancellation&&method==='POST')return send(200,appointments.cancel(user,cancellation[1],await json(req)));
         if(path==='/api/client/vehicles'&&method==='POST'){
           const b=await json(req);
           if(one('SELECT COUNT(*) AS n FROM vehicles WHERE client_id=?',user.id).n>=20)fail(400,'Для добавления более 20 автомобилей обратитесь к администратору');
@@ -129,10 +136,13 @@ export async function createApp(config={}){
         const byte=readByteDepp(bytePath);return send(200,{
           vehicles:cars(all('SELECT vehicles.*,clients.email AS client_email,clients.name AS client_name FROM vehicles LEFT JOIN clients ON clients.id=vehicles.client_id ORDER BY vehicles.created_at DESC'),byte,true),
           clients:all('SELECT id,email,name,created_at FROM clients ORDER BY created_at DESC'),
+          appointments:appointments.list(),
           events:all('SELECT * FROM events ORDER BY id DESC LIMIT 100'),bytedepp:byte,
           server:{time:now(),public_url:publicUrl.origin}
         });
       }
+      const appointmentUpdate=path.match(/^\/api\/appointments\/([0-9a-f-]{36})\/update$/);
+      if(appointmentUpdate&&method==='POST')return send(200,appointments.update(appointmentUpdate[1],await json(req)));
       const assignment=path.match(/^\/api\/vehicles\/([0-9a-f-]{36})\/client$/);
       if(assignment&&method==='POST'){
         const b=await json(req),v=one('SELECT * FROM vehicles WHERE id=?',assignment[1]);if(!v)fail(404,'Автомобиль не найден');
@@ -141,7 +151,7 @@ export async function createApp(config={}){
         if(clientId===v.client_id)return send(200,{ok:true});
         if(clientId&&v.byte_device_id&&b.owner_verified!==true)fail(400,'Подтвердите принадлежность автомобиля выбранному клиенту');
         const previous=v.client_id?one('SELECT email FROM clients WHERE id=?',v.client_id)?.email:null;
-        run('UPDATE vehicles SET client_id=? WHERE id=?',clientId,v.id);
+        db.exec('BEGIN IMMEDIATE');try{appointments.transfer(v.id);run('UPDATE vehicles SET client_id=? WHERE id=?',clientId,v.id);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}
         audit('admin',clientId?'Автомобиль назначен клиенту':'Клиент автомобиля снят',v.vin+' · '+(previous||'Без клиента')+' → '+(account?.email||'Без клиента'));return send(200,{ok:true});
       }
       const link=path.match(/^\/api\/vehicles\/([0-9a-f-]{36})\/link$/);
