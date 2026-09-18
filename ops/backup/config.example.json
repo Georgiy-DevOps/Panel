@@ -3,7 +3,18 @@
   "password_file": "/etc/fleet-backup/password",
   "state_directory": "/var/lib/fleet-backup",
   "roots": ["/etc", "/srv", "/opt", "/root", "/home", "/usr/local", "/var/lib/docker/volumes"],
-  "exclude_paths": ["/etc/fleet-backup/password", "/etc/fleet-backup/peer_key", "/etc/fleet-backup/incoming-password", "/root/.cache", "/root/.npm", "/root/.local/share/pnpm/store", "/opt/1panel/backup"],
-  "required_sqlite": ["/srv/bytedepp/bytedepp.sqlite3", "/var/lib/docker/volumes/app_fleet_data/_data/fleet.sqlite"],
-  "retention": {"daily": 14, "weekly": 8, "monthly": 6}
+  "exclude_paths": [
+    "/etc/fleet-backup/password",
+    "/etc/fleet-backup/peer_key",
+    "/etc/fleet-backup/incoming-password",
+    "/root/.cache",
+    "/root/.npm",
+    "/root/.local/share/pnpm/store",
+    "/opt/1panel/backup"
+  ],
+  "required_sqlite": [
+    "/srv/bytedepp/bytedepp.sqlite3",
+    "/var/lib/docker/volumes/app_fleet_data/_data/fleet.sqlite"
+  ],
+  "retention": { "daily": 14, "weekly": 8, "monthly": 6 }
 }

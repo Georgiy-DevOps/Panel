@@ -1,0 +1,29 @@
+services:
+  panel:
+    image: ${PANEL_IMAGE:?Immutable image reference is required}
+    restart: unless-stopped
+    init: true
+    cpus: ${PANEL_CPUS:-1.0}
+    mem_limit: ${PANEL_MEMORY:-512m}
+    pids_limit: 128
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:?PUBLIC_URL is required}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?ADMIN_PASSWORD_HASH is required}
+      TRUST_PROXY: '1'
+      BYTEDEPP_DB: /source/bytedepp.sqlite3
+    ports:
+      - '127.0.0.1:${PANEL_PORT:?PANEL_PORT is required}:3080'
+    volumes:
+      - fleet_data:/app/data
+      - ${BYTEDEPP_SOURCE:?BYTEDEPP_SOURCE is required}:/source/bytedepp.sqlite3:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  fleet_data:
+    external: true
+    name: ${PANEL_DATA_VOLUME:?Existing data volume is required}

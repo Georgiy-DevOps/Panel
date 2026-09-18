@@ -1,21 +1,200 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10151d"><title>ByteDepp — личный кабинет</title><meta name="description" content="Ваши автомобили, запись на ТО и диагностику, история обращений и сервисы ByteDepp."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/client.css"><link rel="stylesheet" href="/appointments.css"><script type="module" src="/client.js"></script></head>
-<body>
-<div id="auth" class="login-wrap" hidden><div class="login-card"><div class="brand"><span class="brand-mark">B</span> BYTEDEPP</div><p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ КЛИЕНТА</p><h1>Ваш автомобиль.<br>Забота в деталях.</h1><p class="muted">Записывайтесь на ТО и диагностику, следите за обращениями и сервисами ByteDepp.</p><div class="tabs auth-tabs"><button id="login-tab" class="selected" type="button">Вход</button><button id="register-tab" type="button">Регистрация</button></div><form id="auth-form"><label id="name-label" hidden>Ваше имя<input name="name" maxlength="100" autocomplete="name" disabled></label><label>Email<input type="email" name="email" required maxlength="254" autocomplete="username"></label><label>Пароль<input type="password" name="password" required maxlength="256" autocomplete="current-password"></label><p id="password-hint" class="form-hint" hidden>Не менее 12 символов. Email используется как логин.</p><p class="error-text" id="auth-error" role="alert"></p><button id="auth-submit" class="primary" type="submit">Войти в кабинет →</button></form><a class="admin-link" href="/admin">Вход для администратора ↗</a></div><div class="login-graphic" aria-hidden="true"><span>YOUR CAR.<br>OUR CARE.</span><div class="orbit o1"></div><div class="orbit o2"></div><div class="orbit o3"></div><b>BYTEDEPP / LYNK & CO / ZEEKR</b></div></div>
-<div id="cabinet" hidden>
-  <header class="client-topbar"><a class="brand" href="/"><span class="brand-mark">B</span> BYTEDEPP</a><div class="client-menu"><span id="client-name"></span><button id="logout-client">Выйти</button></div></header>
-  <main class="client-main">
-    <div id="client-offline" class="notice error" hidden role="alert">Не удалось обновить данные. Проверьте соединение.</div>
-    <section class="client-hero"><div><p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p><h1>Всё для вашего автомобиля</h1><p class="muted">Обслуживание, диагностика и ByteDepp.<br>Выберите услугу — мы согласуем удобный визит.</p></div><button class="primary" data-book>Записаться на сервис →</button></section>
-    <section id="next-visit" class="next-visit" aria-label="Ближайший визит" hidden></section>
-    <section class="cabinet-section" aria-labelledby="services-title"><div class="section-heading"><div><h2 id="services-title">Чем можем помочь</h2><p class="muted">Оставьте заявку. Дату, адрес и детали подтвердит администратор.</p></div></div><div id="service-options" class="service-options"></div></section>
-    <section class="cabinet-section" aria-labelledby="cars-title"><div class="section-heading"><div><h2 id="cars-title">Мои автомобили</h2><p class="muted">Данные автомобиля и подключённые сервисы.</p></div><button id="add-vin">＋ Добавить VIN</button></div><div id="client-cars" class="client-cars"></div></section>
-    <section id="requests" class="cabinet-section" aria-labelledby="requests-title"><div class="section-heading"><div><h2 id="requests-title">Мои заявки</h2><p class="muted">Подтверждение визита, комментарии и результаты работ — здесь.</p></div><span id="request-count" class="appointment-count"></span></div><div class="tabs request-tabs" aria-label="Фильтр заявок"><button class="selected" data-request-filter="active" aria-pressed="true">Активные</button><button data-request-filter="history" aria-pressed="false">История обращений</button></div><div id="client-appointments" class="appointment-list"></div></section>
-    <section class="cabinet-section" aria-label="Перед визитом"><div class="previsit"><div><h3>Дождитесь подтверждения</h3><p>Отправка заявки ещё не бронирует время. Согласованные дата и адрес появятся в кабинете.</p></div><div><h3>Расскажите о проблеме</h3><p>Укажите пробег и опишите, когда возникает неисправность. Это поможет подготовиться к диагностике.</p></div><div><h3>Планы изменились?</h3><p>Отменить заявку можно до начала работ. Для переноса отмените её и выберите новую дату.</p></div></div></section>
-    <footer><span>BYTEDEPP · Личный кабинет</span><a href="/admin">Вход администратора ↗</a></footer>
-  </main>
-</div>
-<dialog id="vin-modal" aria-labelledby="vin-title"><div class="modal-top"><h2 id="vin-title">Добавить автомобиль</h2><button id="close-vin" class="icon-button" aria-label="Закрыть">×</button></div><form id="vin-form"><label>VIN автомобиля<input name="vin" required minlength="17" maxlength="17" pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}" placeholder="17 символов" autocomplete="off"></label><p class="form-hint">VIN нужен для регистрации и сопоставления автомобиля. Версия системы поступит из ByteDepp.</p><div class="form-grid"><label>Марка<select name="brand"><option value="">Не указана</option><option>Zeekr</option><option>Lynk &amp; Co</option></select></label><label>Модель<input name="model" maxlength="100" placeholder="Например, 001 или 900"></label><label>Регион / рынок<input name="region" maxlength="100" placeholder="Необязательно"></label></div><p class="form-hint">После добавления автомобиля можно отправить заявку на сервис.</p><p id="vin-error" class="error-text" role="alert"></p><div class="form-actions"><button class="primary" type="submit">Зарегистрировать VIN</button></div></form></dialog>
-<dialog id="booking-modal" aria-labelledby="booking-title"><div class="modal-top"><h2 id="booking-title">Запись на сервис</h2><button id="close-booking" class="icon-button" aria-label="Закрыть">×</button></div><div id="booking-body"></div></dialog>
-<div id="toast" role="status" hidden></div>
-</body></html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#10151d" />
+    <title>ByteDepp — личный кабинет</title>
+    <meta
+      name="description"
+      content="Ваши автомобили, запись на ТО и диагностику, история обращений и сервисы ByteDepp."
+    />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/client.css" />
+    <link rel="stylesheet" href="/appointments.css" />
+    <script type="module" src="/client.js"></script>
+  </head>
+  <body>
+    <div id="auth" class="login-wrap" hidden>
+      <div class="login-card">
+        <div class="brand"><span class="brand-mark">B</span> BYTEDEPP</div>
+        <p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ КЛИЕНТА</p>
+        <h1>Ваш автомобиль.<br />Забота в деталях.</h1>
+        <p class="muted">
+          Записывайтесь на ТО и диагностику, следите за обращениями и сервисами ByteDepp.
+        </p>
+        <div class="tabs auth-tabs">
+          <button id="login-tab" class="selected" type="button">Вход</button
+          ><button id="register-tab" type="button">Регистрация</button>
+        </div>
+        <form id="auth-form">
+          <label id="name-label" hidden
+            >Ваше имя<input name="name" maxlength="100" autocomplete="name" disabled /></label
+          ><label
+            >Email<input
+              type="email"
+              name="email"
+              required
+              maxlength="254"
+              autocomplete="username" /></label
+          ><label
+            >Пароль<input
+              type="password"
+              name="password"
+              required
+              maxlength="256"
+              autocomplete="current-password"
+          /></label>
+          <p id="password-hint" class="form-hint" hidden>
+            Не менее 12 символов. Email используется как логин.
+          </p>
+          <p class="error-text" id="auth-error" role="alert"></p>
+          <button id="auth-submit" class="primary" type="submit">Войти в кабинет →</button>
+        </form>
+        <a class="admin-link" href="/admin">Вход для администратора ↗</a>
+      </div>
+      <div class="login-graphic" aria-hidden="true">
+        <span>YOUR CAR.<br />OUR CARE.</span>
+        <div class="orbit o1"></div>
+        <div class="orbit o2"></div>
+        <div class="orbit o3"></div>
+        <b>BYTEDEPP / LYNK & CO / ZEEKR</b>
+      </div>
+    </div>
+    <div id="cabinet" hidden>
+      <header class="client-topbar">
+        <a class="brand" href="/"><span class="brand-mark">B</span> BYTEDEPP</a>
+        <div class="client-menu">
+          <span id="client-name"></span><button id="logout-client">Выйти</button>
+        </div>
+      </header>
+      <main class="client-main">
+        <div id="client-offline" class="notice error" hidden role="alert">
+          Не удалось обновить данные. Проверьте соединение.
+        </div>
+        <section class="client-hero">
+          <div>
+            <p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p>
+            <h1>Всё для вашего автомобиля</h1>
+            <p class="muted">
+              Обслуживание, диагностика и ByteDepp.<br />Выберите услугу — мы согласуем удобный
+              визит.
+            </p>
+          </div>
+          <button class="primary" data-book>Записаться на сервис →</button>
+        </section>
+        <section id="next-visit" class="next-visit" aria-label="Ближайший визит" hidden></section>
+        <section class="cabinet-section" aria-labelledby="services-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="services-title">Чем можем помочь</h2>
+              <p class="muted">Оставьте заявку. Дату, адрес и детали подтвердит администратор.</p>
+            </div>
+          </div>
+          <div id="service-options" class="service-options"></div>
+        </section>
+        <section class="cabinet-section" aria-labelledby="cars-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="cars-title">Мои автомобили</h2>
+              <p class="muted">Данные автомобиля и подключённые сервисы.</p>
+            </div>
+            <button id="add-vin">＋ Добавить VIN</button>
+          </div>
+          <div id="client-cars" class="client-cars"></div>
+        </section>
+        <section id="requests" class="cabinet-section" aria-labelledby="requests-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="requests-title">Мои заявки</h2>
+              <p class="muted">Подтверждение визита, комментарии и результаты работ — здесь.</p>
+            </div>
+            <span id="request-count" class="appointment-count"></span>
+          </div>
+          <div class="tabs request-tabs" aria-label="Фильтр заявок">
+            <button class="selected" data-request-filter="active" aria-pressed="true">
+              Активные</button
+            ><button data-request-filter="history" aria-pressed="false">История обращений</button>
+          </div>
+          <div id="client-appointments" class="appointment-list"></div>
+        </section>
+        <section class="cabinet-section" aria-label="Перед визитом">
+          <div class="previsit">
+            <div>
+              <h3>Дождитесь подтверждения</h3>
+              <p>
+                Отправка заявки ещё не бронирует время. Согласованные дата и адрес появятся в
+                кабинете.
+              </p>
+            </div>
+            <div>
+              <h3>Расскажите о проблеме</h3>
+              <p>
+                Укажите пробег и опишите, когда возникает неисправность. Это поможет подготовиться к
+                диагностике.
+              </p>
+            </div>
+            <div>
+              <h3>Планы изменились?</h3>
+              <p>
+                Отменить заявку можно до начала работ. Для переноса отмените её и выберите новую
+                дату.
+              </p>
+            </div>
+          </div>
+        </section>
+        <footer>
+          <span>BYTEDEPP · Личный кабинет</span><a href="/admin">Вход администратора ↗</a>
+        </footer>
+      </main>
+    </div>
+    <dialog id="vin-modal" aria-labelledby="vin-title">
+      <div class="modal-top">
+        <h2 id="vin-title">Добавить автомобиль</h2>
+        <button id="close-vin" class="icon-button" aria-label="Закрыть">×</button>
+      </div>
+      <form id="vin-form">
+        <label
+          >VIN автомобиля<input
+            name="vin"
+            required
+            minlength="17"
+            maxlength="17"
+            pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}"
+            placeholder="17 символов"
+            autocomplete="off"
+        /></label>
+        <p class="form-hint">
+          VIN нужен для регистрации и сопоставления автомобиля. Версия системы поступит из ByteDepp.
+        </p>
+        <div class="form-grid">
+          <label
+            >Марка<select name="brand">
+              <option value="">Не указана</option>
+              <option>Zeekr</option>
+              <option>Lynk &amp; Co</option>
+            </select></label
+          ><label
+            >Модель<input name="model" maxlength="100" placeholder="Например, 001 или 900" /></label
+          ><label
+            >Регион / рынок<input name="region" maxlength="100" placeholder="Необязательно"
+          /></label>
+        </div>
+        <p class="form-hint">После добавления автомобиля можно отправить заявку на сервис.</p>
+        <p id="vin-error" class="error-text" role="alert"></p>
+        <div class="form-actions">
+          <button class="primary" type="submit">Зарегистрировать VIN</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="booking-modal" aria-labelledby="booking-title">
+      <div class="modal-top">
+        <h2 id="booking-title">Запись на сервис</h2>
+        <button id="close-booking" class="icon-button" aria-label="Закрыть">×</button>
+      </div>
+      <div id="booking-body"></div>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+  </body>
+</html>

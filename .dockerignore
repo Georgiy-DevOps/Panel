@@ -6,3 +6,10 @@ test
 *.zip
 device.json
 simulator-downloads
+node_modules
+coverage
+.ci-tools
+.github
+ops
+integration
+requirements-ci.txt

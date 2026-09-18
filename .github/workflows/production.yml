@@ -1,0 +1,62 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+    inputs:
+      delivery_run_id:
+        description: Successful Panel pipeline run ID whose staging release you approve
+        required: true
+        type: string
+      confirmation:
+        description: Type DEPLOY to approve production
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: panel-delivery
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && github.run_attempt == 1 && inputs.confirmation == 'DEPLOY'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Verify approved run passed all checks and staging
+        id: approved
+        run: python3 ci/check_production_gate.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DELIVERY_RUN_ID: ${{ inputs.delivery_run_id }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: panel-release-${{ steps.approved.outputs.revision }}
+          run-id: ${{ inputs.delivery_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: approved-release
+      - name: Promote only the digest currently verified on staging
+        run: python3 ci/deploy_remote.py
+        env:
+          DEPLOY_HOST: ${{ vars.PRODUCTION_HOST }}
+          DEPLOY_USER: ${{ vars.PRODUCTION_USER }}
+          DEPLOY_PORT: ${{ vars.PRODUCTION_PORT || '22' }}
+          DEPLOY_SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_AUDIENCE: ${{ vars.PRODUCTION_AUDIENCE }}
+          DEPLOY_RECEIPT: approved-release/release.json
+          DEPLOY_REVISION: ${{ steps.approved.outputs.revision }}
+          DELIVERY_RUN_ID: ${{ inputs.delivery_run_id }}
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
