@@ -1,0 +1,12 @@
+# Small, bounded set of change watches; no blanket process/network logging.
+# Install only after checking these paths exist on the target host.
+-w /etc/ssh/ -p wa -k fleet_ssh
+-w /root/.ssh/ -p wa -k fleet_root_keys
+-w /etc/passwd -p wa -k fleet_accounts
+-w /etc/shadow -p wa -k fleet_accounts
+-w /etc/group -p wa -k fleet_accounts
+-w /etc/sudoers -p wa -k fleet_privilege
+-w /etc/sudoers.d/ -p wa -k fleet_privilege
+-w /etc/systemd/system/ -p wa -k fleet_services
+-w /etc/ufw/ -p wa -k fleet_firewall
+-w /etc/fail2ban/ -p wa -k fleet_firewall

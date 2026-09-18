@@ -1,0 +1,15 @@
+[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1
+usedns = no
+findtime = 10m
+maxretry = 5
+bantime = 1h
+bantime.increment = true
+bantime.maxtime = 7d
+banaction = nftables[type=multiport]
+
+[sshd]
+enabled = true
+backend = systemd
+port = 22
+mode = normal
