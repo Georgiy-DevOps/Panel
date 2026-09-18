@@ -14,7 +14,7 @@ result = subprocess.run(
     capture_output=True,
     text=True,
 )
-output = result.stdout + result.stderr
+output = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", result.stdout + result.stderr)
 print(output)
 if result.returncode or re.search(r"\bERR\b", output):
     raise SystemExit("Secret scan failed")
