@@ -3,6 +3,7 @@
 Usage: python3 extend_bytedepp.py /path/to/bytedepp_server.py
 Back up the source and database before applying this patch.
 """
+
 import ast
 from pathlib import Path
 import sys
@@ -13,19 +14,25 @@ if "def vehicle_session(body):" in source:
     print("ByteDepp vehicle reporting is already installed")
     sys.exit(0)
 
+
 def replace(old, new):
     global source
     if source.count(old) != 1:
-        raise RuntimeError("Unexpected ByteDepp source; patch was not applied: " + old[:70])
+        raise RuntimeError(
+            "Unexpected ByteDepp source; patch was not applied: " + old[:70]
+        )
     source = source.replace(old, new, 1)
+
 
 replace("import json\n", "import json\nimport re\n")
 replace("import sqlite3\n", "import sqlite3\nfrom contextlib import contextmanager\n")
-replace('''def connect():
+replace(
+    """def connect():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-''', '''@contextmanager
+""",
+    """@contextmanager
 def connect():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -34,11 +41,14 @@ def connect():
             yield conn
     finally:
         conn.close()
-''')
-replace('''        conn.commit()
+""",
+)
+replace(
+    """        conn.commit()
 
 
-def get_device(device_id):''', '''        columns = {row[1] for row in conn.execute("PRAGMA table_info(devices)")}
+def get_device(device_id):""",
+    """        columns = {row[1] for row in conn.execute("PRAGMA table_info(devices)")}
         for name, kind in [
             ("vehicle_software_version", "TEXT"),
             ("vin_reported_at", "INTEGER"),
@@ -49,11 +59,14 @@ def get_device(device_id):''', '''        columns = {row[1] for row in conn.exec
         conn.commit()
 
 
-def get_device(device_id):''')
+def get_device(device_id):""",
+)
 
-start = source.index('def upsert_device(')
-end = source.index('\ndef bind_telegram(', start)
-source = source[:start] + '''def upsert_device(device_id, vin="", vehicle_software_version=None):
+start = source.index("def upsert_device(")
+end = source.index("\ndef bind_telegram(", start)
+source = (
+    source[:start]
+    + """def upsert_device(device_id, vin="", vehicle_software_version=None):
     timestamp = now_ms()
     with connect() as conn:
         conn.execute("BEGIN IMMEDIATE")
@@ -104,23 +117,30 @@ def vehicle_session(body):
     return upsert_device(device_id, vin, software or None)
 
 
-''' + source[end+1:]
+"""
+    + source[end + 1 :]
+)
 
-replace('''        "vin": device["vin"],
-''', '''        "vin": device["vin"],
+replace(
+    """        "vin": device["vin"],
+""",
+    """        "vin": device["vin"],
         "vehicleSoftwareVersion": device["vehicle_software_version"],
         "vinReportedAtMillis": device["vin_reported_at"],
         "vehicleSoftwareReportedAtMillis": device["vehicle_software_reported_at"],
-''')
+""",
+)
 
-replace('''            body = read_json(self)
+replace(
+    """            body = read_json(self)
             device_id = body.get("deviceId", "")
             if not device_id:
                 send_json(self, 400, {"error": "deviceId is required"})
                 return
             device = upsert_device(device_id, body.get("vin", ""))
             send_json(self, 200, license_payload(device))
-''', '''            try:
+""",
+    """            try:
                 length = int(self.headers.get("Content-Length", "0"))
                 if length > 32768:
                     self.close_connection = True
@@ -133,7 +153,8 @@ replace('''            body = read_json(self)
                 send_json(self, 400, {"error": str(error)})
                 return
             send_json(self, 200, license_payload(device))
-''')
+""",
+)
 
 ast.parse(source)
 path.write_text(source, encoding="utf-8")
