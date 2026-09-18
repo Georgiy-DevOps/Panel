@@ -157,7 +157,7 @@ function renderVehicles() {
           : 'Активен, бессрочно'
         : 'Не активен';
   $('#vehicle-detail').innerHTML =
-    `<p class="detail-caption">КАРТОЧКА АВТОМОБИЛЯ</p><span class="vehicle-brand">${esc(v.brand)}</span><h2>${esc(v.model)}</h2><span class="vin">${esc(v.vin)}</span><dl>${row('Клиент', v.client_name || 'Не назначен')}${row('Email', v.client_email || '—')}${row('VIN из ByteDepp', v.reported_vin || 'Не передан')}${row('Версия системы авто', v.software || 'Не передана ByteDepp')}${v.software_reported_at ? row('Версия получена', fmt(v.software_reported_at)) : ''}${row('Регион', v.region || 'Не указан')}${row('Связь', states[v.link_status])}${row('Устройство', v.byte_device_id || 'Не связано')}${v.bytedepp ? row('Русский язык', license(v.bytedepp.language)) + row('Магазин', license(v.bytedepp.store)) : ''}</dl><button data-assign-client="${v.id}">${v.client_id ? 'Изменить клиента' : 'Назначить клиента'}</button><button class="primary" data-link="${v.id}" ${!state.bytedepp.connected ? 'disabled' : ''}>${v.byte_device_id ? 'Изменить связь' : 'Связать с ByteDepp'}</button>${v.byte_device_id ? `<button data-unlink="${v.id}">Снять связь</button>` : ''}<p class="muted">VIN из ByteDepp, версия системы и статусы сервисов поступают с сервера приложения. VIN при регистрации используется для сопоставления автомобиля.</p>`;
+    `<p class="detail-caption">КАРТОЧКА АВТОМОБИЛЯ</p><span class="vehicle-brand">${esc(v.brand)}</span><h2>${esc(v.model)}</h2><span class="vin">${esc(v.vin)}</span><dl>${row('Клиент', v.client_name || 'Не назначен')}${row('Email', v.client_email || '—')}${row('VIN из ByteDepp', v.reported_vin || 'Не передан')}${row('Версия системы авто', v.software || 'Не передана ByteDepp')}${v.software_reported_at ? row('Версия получена', fmt(v.software_reported_at)) : ''}${row('Регион', v.region || 'Не указан')}${row('Связь', states[v.link_status])}${row('Устройство', v.byte_device_id || 'Не связано')}${v.bytedepp ? row('Русский язык', license(v.bytedepp.language)) + row('Магазин', license(v.bytedepp.store)) : ''}</dl><button data-assign-client="${v.id}">${v.client_id ? 'Изменить клиента' : 'Назначить клиента'}</button><button class="primary" data-link="${v.id}" ${!state.bytedepp.connected ? 'disabled' : ''}>${v.byte_device_id ? 'Изменить связь' : 'Связать с ByteDepp'}</button>${v.byte_device_id ? `<button data-unlink="${v.id}">Снять связь</button>` : ''}<button class="danger" data-delete-vehicle="${v.id}">Удалить автомобиль</button><p class="muted">VIN из ByteDepp, версия системы и статусы сервисов поступают с сервера приложения. VIN при регистрации используется для сопоставления автомобиля.</p>`;
 }
 function setView(next) {
   view = next;
@@ -263,6 +263,26 @@ function linkVehicle(id) {
     api(`/vehicles/${id}/link`, { ...b, owner_verified: b.owner_verified === 'on' }),
   );
 }
+function deleteVehicle(id) {
+  const v = state.vehicles.find((v) => v.id === id);
+  if (!v) return;
+  if (state.appointments.some((a) => a.vehicle_id === id)) {
+    modal(
+      'Удаление недоступно',
+      '<p class="muted">У автомобиля есть сервисные заявки. Он сохранён в панели, чтобы не потерять историю обслуживания.</p><div class="form-actions"><button data-close>Закрыть</button></div>',
+    );
+    return;
+  }
+  modal(
+    'Удалить автомобиль',
+    `<form><div class="field-summary">${esc(v.brand)} ${esc(v.model)}<br>VIN: <strong>${esc(v.vin)}</strong></div><p class="muted">Автомобиль исчезнет из панели и кабинета клиента. Связь с ByteDepp будет снята; устройство и лицензии в ByteDepp останутся без изменений. Отменить удаление нельзя. VIN можно будет зарегистрировать заново.</p><label>Введите VIN для подтверждения<input name="confirm_vin" required minlength="17" maxlength="17" autocomplete="off" spellcheck="false"></label>${formEnd('Удалить автомобиль')}</form>`,
+  );
+  $('#modal form button[type="submit"]').classList.add('danger');
+  handleForm(async (b) => {
+    await api(`/vehicles/${id}/delete`, b);
+    selectedId = null;
+  }, 'Автомобиль удалён');
+}
 function unlinkVehicle(id) {
   const v = state.vehicles.find((v) => v.id === id);
   modal(
@@ -315,6 +335,7 @@ document.addEventListener('click', (e) => {
   if (b.hasAttribute('data-add-vehicle')) addVehicle();
   if (b.dataset.assignClient) assignClient(b.dataset.assignClient);
   if (b.dataset.link) linkVehicle(b.dataset.link);
+  if (b.dataset.deleteVehicle) deleteVehicle(b.dataset.deleteVehicle);
   if (b.dataset.unlink) unlinkVehicle(b.dataset.unlink);
   if (b.hasAttribute('data-close')) $('#modal').close();
 });

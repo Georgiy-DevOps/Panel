@@ -385,6 +385,28 @@ export async function createApp(config = {}) {
       const appointmentUpdate = path.match(/^\/api\/appointments\/([0-9a-f-]{36})\/update$/);
       if (appointmentUpdate && method === 'POST')
         return send(200, appointments.update(appointmentUpdate[1], await json(req)));
+      const deletion = path.match(/^\/api\/vehicles\/([0-9a-f-]{36})\/delete$/);
+      if (deletion && method === 'POST') {
+        const b = await json(req);
+        db.exec('BEGIN IMMEDIATE');
+        try {
+          const v = one('SELECT * FROM vehicles WHERE id=?', deletion[1]);
+          if (!v) fail(404, 'Автомобиль не найден');
+          if (b.confirm_vin !== v.vin) fail(400, 'Подтвердите VIN');
+          if (one('SELECT id FROM appointments WHERE vehicle_id=? LIMIT 1', v.id))
+            fail(
+              409,
+              'У автомобиля есть сервисные заявки. Удаление недоступно, чтобы сохранить историю обслуживания.',
+            );
+          run('DELETE FROM vehicles WHERE id=?', v.id);
+          audit('admin', 'Автомобиль удалён', v.vin);
+          db.exec('COMMIT');
+        } catch (e) {
+          db.exec('ROLLBACK');
+          throw e;
+        }
+        return send(200, { ok: true });
+      }
       const assignment = path.match(/^\/api\/vehicles\/([0-9a-f-]{36})\/client$/);
       if (assignment && method === 'POST') {
         const b = await json(req),

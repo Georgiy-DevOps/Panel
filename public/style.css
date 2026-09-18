@@ -1109,3 +1109,12 @@ a:focus-visible {
   background: var(--brand);
   color: #fff;
 }
+
+button.danger {
+  color: #ffb4b4;
+  background: #301f25;
+  border-color: #9d535d;
+}
+button.danger:hover {
+  background: #48252d;
+}
