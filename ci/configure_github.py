@@ -17,6 +17,11 @@ def main():
     parser.add_argument("--host", default="84.21.173.88")
     parser.add_argument("--gh", default="gh")
     parser.add_argument("--protect-only", action="store_true")
+    parser.add_argument(
+        "--skip-protection",
+        action="store_true",
+        help="Configure delivery only; main remains unprotected",
+    )
     args = parser.parse_args()
     repository = "Kirill-DevSecOps/Panel"
     gh = args.gh
@@ -79,21 +84,25 @@ def main():
             ).encode(),
             check=True,
         )
-    subprocess.run(
-        [
-            gh,
-            "api",
-            "--method",
-            "PUT",
-            "repos/" + repository + "/branches/main/protection",
-            "--input",
-            "ci/main-protection.json",
-        ],
-        check=True,
-    )
-    print(
-        "CI variables, repository secrets and main protection configured. No production deployment was triggered."
-    )
+    if not args.skip_protection:
+        subprocess.run(
+            [
+                gh,
+                "api",
+                "--method",
+                "PUT",
+                "repos/" + repository + "/branches/main/protection",
+                "--input",
+                "ci/main-protection.json",
+            ],
+            check=True,
+        )
+        print("Main protection configured.")
+    else:
+        print(
+            "WARNING: main protection was NOT enabled. An eligible plan is still required."
+        )
+    print("Requested CI settings applied. No production deployment was triggered.")
 
 
 if __name__ == "__main__":
