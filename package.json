@@ -3,10 +3,22 @@
   "version": "0.5.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.14.0 <25" },
+  "engines": {
+    "node": ">=24.14.0 <25"
+  },
   "scripts": {
     "start": "node --env-file-if-exists=.env server.mjs",
     "setup": "node scripts/setup.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include=server.mjs --test-coverage-include=bytedepp.mjs --test-coverage-include=appointments.mjs --test-coverage-include=public/service-catalog.js --test-coverage-include=public/appointments-ui.js --test-coverage-lines=70 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info test/*.test.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.11.0",
+    "globals": "17.12.0",
+    "prettier": "3.9.8"
   }
 }

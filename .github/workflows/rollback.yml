@@ -1,0 +1,59 @@
+name: Roll back production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type ROLLBACK to restore the previous healthy image'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: panel-delivery
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: github.ref == 'refs/heads/main' && github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && github.run_attempt == 1 && inputs.confirmation == 'ROLLBACK'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - run: python3 ci/check_production_gate.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  rollback:
+    needs: gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - run: python3 ci/check_production_gate.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Restore recorded previous image and verify health
+        run: python3 ci/deploy_remote.py
+        env:
+          DEPLOY_ACTION: rollback
+          DEPLOY_AUDIENCE: ${{ vars.PRODUCTION_AUDIENCE }}
+          DEPLOY_HOST: ${{ vars.PRODUCTION_HOST }}
+          DEPLOY_USER: ${{ vars.PRODUCTION_USER }}
+          DEPLOY_PORT: ${{ vars.PRODUCTION_PORT || '22' }}
+          DEPLOY_SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_IMAGE: recorded-previous
+          DEPLOY_REVISION: recorded-previous
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}

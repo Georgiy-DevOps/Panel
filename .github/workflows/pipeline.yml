@@ -1,0 +1,198 @@
+name: Panel pipeline
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: panel-${{ github.event.pull_request.number || 'delivery' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality:
+    name: Panel quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 24.19.0
+          cache: npm
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts --no-fund
+      - run: python -m pip install -r requirements-ci.txt
+      - name: Format and lint
+        run: |
+          npm run format:check
+          npm run lint
+          python -m black --check .
+          python -m ruff check .
+          python ci/install_tools.py actionlint
+          .ci-tools/actionlint
+      - name: Tests and coverage
+        run: |
+          mkdir -p coverage
+          npm run test:coverage
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends restic
+          python ci/test_python.py
+      - name: Dependency vulnerability checks
+        run: |
+          npm audit --audit-level=high
+          python -m pip_audit --strict -r requirements-ci.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: panel-coverage-${{ github.sha }}
+          path: coverage/
+          retention-days: 14
+
+  secrets:
+    name: Panel secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: python3 ci/install_tools.py gitleaks
+      - run: python3 ci/scan_secrets.py
+
+  image:
+    name: Panel image
+    needs: [quality, secrets]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - run: python3 ci/install_tools.py trivy
+      - name: Build and scan the exact candidate
+        env:
+          REVISION: ${{ github.sha }}
+        run: |
+          docker build --pull --platform linux/amd64 --label "org.opencontainers.image.revision=$REVISION" --tag "panel-ci:$REVISION" .
+          .ci-tools/trivy image --scanners vuln --severity CRITICAL --exit-code 1 --format json --output image-scan.json "panel-ci:$REVISION"
+      - name: Save verified candidate
+        if: github.event_name == 'push'
+        env:
+          REVISION: ${{ github.sha }}
+        run: docker save "panel-ci:$REVISION" | gzip > panel-image.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: github.event_name == 'push'
+        with:
+          name: panel-image-${{ github.sha }}
+          path: panel-image.tar.gz
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: panel-image-scan-${{ github.sha }}
+          path: image-scan.json
+          retention-days: 14
+
+  ci:
+    name: Panel CI
+    needs: [quality, secrets, image]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require every check to succeed
+        env:
+          CHECKS: ${{ toJSON(needs) }}
+        run: jq -e 'all(.[]; .result == "success")' <<< "$CHECKS"
+
+  publish:
+    name: Publish verified image
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.publish.outputs.image }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: panel-image-${{ github.sha }}
+      - name: Publish immutable commit and digest
+        id: publish
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+          REPOSITORY: ${{ github.repository }}
+          REVISION: ${{ github.sha }}
+        run: |
+          image="ghcr.io/${REPOSITORY,,}"
+          printf '%s' "$REGISTRY_TOKEN" | docker login ghcr.io --username "$REGISTRY_USER" --password-stdin
+          trap 'docker logout ghcr.io' EXIT
+          docker load --input panel-image.tar.gz
+          docker tag "panel-ci:$REVISION" "$image:$REVISION"
+          docker push "$image:$REVISION"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$image:$REVISION")
+          [[ "$digest" == "$image@sha256:"* ]]
+          echo "image=$digest" >> "$GITHUB_OUTPUT"
+          echo "Published: \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+
+  staging:
+    name: Deploy and verify staging
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Deploy through restricted SSH command and run server-side smoke tests
+        env:
+          DEPLOY_AUDIENCE: ${{ vars.STAGING_AUDIENCE }}
+          DEPLOY_HOST: ${{ vars.STAGING_HOST }}
+          DEPLOY_USER: ${{ vars.STAGING_USER }}
+          DEPLOY_PORT: ${{ vars.STAGING_PORT || '22' }}
+          DEPLOY_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_IMAGE: ${{ needs.publish.outputs.image }}
+          DEPLOY_REVISION: ${{ github.sha }}
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 ci/deploy_remote.py
+      - name: Save staging receipt
+        env:
+          DEPLOY_IMAGE: ${{ needs.publish.outputs.image }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          with open('release.json', 'w') as f:
+              json.dump({'image': os.environ['DEPLOY_IMAGE'], 'revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID']}, f)
+          PY
+          echo 'Staging passed. Production requires a separate owner-initiated Deploy production run.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: panel-release-${{ github.sha }}
+          path: release.json
+          retention-days: 30
+          if-no-files-found: error

@@ -7,3 +7,10 @@ device.json
 .sites-runtime/
 __pycache__/
 *.pyc
+node_modules/
+coverage/
+.ci-tools/
+*.sarif
+ci-*.json
+
+.coverage*
