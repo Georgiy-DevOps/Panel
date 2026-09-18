@@ -1,12 +1,16 @@
 :root {
   color-scheme: dark;
-  --bg: #0d1118;
-  --surface: #151b24;
-  --surface2: #1b2330;
-  --border: #283241;
-  --text: #f1f3f9;
-  --muted: #929fb3;
-  --accent: #8878ff;
+  --bg: #101010;
+  --surface: #191919;
+  --surface2: #242323;
+  --border: #383534;
+  --text: #f5f2ef;
+  --muted: #b0aaa5;
+  /* ByteDepp brand red; brighter accent for text on dark surfaces. */
+  --brand: #e01822;
+  --accent: #ff737b;
+  --accent-soft: #301d20;
+  --accent-border: #794249;
   --green: #66d8b4;
   --red: #ff9d9d;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
@@ -54,24 +58,24 @@ button {
   transition: background 0.15s;
 }
 button:hover {
-  background: #283348;
+  background: #343130;
 }
 button.primary {
-  background: var(--accent);
-  color: #111025;
-  border-color: var(--accent);
+  background: var(--brand);
+  color: #ffffff;
+  border-color: var(--brand);
   font-weight: 650;
   white-space: nowrap;
 }
 button.primary:hover {
-  background: #a69aff;
+  background: #c8141e;
 }
 input,
 select {
   width: 100%;
-  background: #101720;
+  background: #131313;
   color: var(--text);
-  border: 1px solid #344155;
+  border: 1px solid #57514d;
   border-radius: 7px;
   padding: 12px;
   min-width: 0;
@@ -81,8 +85,9 @@ select:focus {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
-input::placeholder {
-  color: #8190a5;
+input::placeholder,
+textarea::placeholder {
+  color: #a59d97;
 }
 label {
   display: grid;
@@ -122,7 +127,7 @@ h3 {
 }
 .sidebar {
   width: 226px;
-  background: #111720;
+  background: #151414;
   border-right: 1px solid var(--border);
   padding: 31px 20px;
   position: fixed;
@@ -143,8 +148,8 @@ h3 {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: var(--accent);
-  color: #141026;
+  background: var(--brand);
+  color: #ffffff;
   display: grid;
   place-items: center;
   font-size: 1.4rem;
@@ -160,7 +165,7 @@ h3 {
 .nav-caption {
   font-size: 0.7rem;
   letter-spacing: 0.14em;
-  color: #758399;
+  color: #a59d97;
   margin: 54px 12px 17px;
 }
 .nav-item {
@@ -182,13 +187,13 @@ h3 {
   text-align: center;
 }
 .nav-item.active {
-  color: #c9c0ff;
-  background: #26213c;
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 .nav-item small {
   margin-left: auto;
   padding: 2px 6px;
-  background: #383052;
+  background: #49262a;
   border-radius: 4px;
 }
 .sidebar-foot {
@@ -196,7 +201,7 @@ h3 {
 }
 .supported {
   padding: 30px 12px;
-  color: #67778f;
+  color: #a59d97;
   letter-spacing: 0.2em;
   font-size: 0.75rem;
   line-height: 2.2;
@@ -234,14 +239,14 @@ main {
   color: var(--muted);
 }
 .slash {
-  color: #596678;
+  color: #a59d97;
   padding: 0 15px;
 }
 .admin-badge {
   display: flex;
   align-items: center;
   gap: 11px;
-  color: #b4bed0;
+  color: #c5bdb7;
 }
 .admin-badge > span {
   display: grid;
@@ -249,8 +254,8 @@ main {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #2a3041;
-  color: #d9dff0;
+  background: #302c2a;
+  color: #f5f2ef;
 }
 .content {
   max-width: 1640px;
@@ -285,7 +290,7 @@ main {
 }
 .stats article > span {
   font-size: 0.85rem;
-  color: #bcc5d4;
+  color: #c5bdb7;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -308,7 +313,7 @@ main {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #778398;
+  background: #a59d97;
 }
 .dot.green {
   background: var(--green);
@@ -333,7 +338,7 @@ main {
   color: var(--muted);
 }
 .tabs .selected {
-  background: #252d3a;
+  background: #343130;
   color: #fff;
 }
 .search {
@@ -382,18 +387,18 @@ table {
 th {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #94a2b8;
-  background: #19212c;
+  color: #b0aaa5;
+  background: #211f1e;
   padding: 17px 18px;
   border-bottom: 1px solid var(--border);
 }
 td {
   padding: 20px 18px;
-  border-bottom: 1px solid #242d3b;
+  border-bottom: 1px solid #383534;
   font-size: 0.8rem;
 }
 tr.selected td {
-  background: #1b2032;
+  background: #282323;
 }
 td strong {
   font-size: 0.9rem;
@@ -418,7 +423,7 @@ td strong {
 .row-open {
   padding: 5px 10px;
   background: transparent;
-  color: #ab9eff;
+  color: var(--accent);
   border: 0;
 }
 .pill {
@@ -428,8 +433,8 @@ td strong {
   padding: 5px 8px;
   font-size: 0.7rem;
   border-radius: 5px;
-  color: #aeb9cc;
-  background: #242d3a;
+  color: #c5bdb7;
+  background: #302c2a;
   white-space: nowrap;
 }
 .pill.online,
@@ -443,8 +448,8 @@ td strong {
 .pill.downloading,
 .pill.awaiting_confirmation,
 .pill.installing {
-  color: #bdb1ff;
-  background: #302947;
+  color: #ffcc91;
+  background: #3c3025;
 }
 .pill.failed,
 .pill.error {
@@ -463,8 +468,8 @@ td strong {
 .empty-symbol {
   font-size: 2rem;
   color: var(--accent);
-  border: 1px solid #453c65;
-  background: #242035;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
   width: 66px;
   height: 66px;
   border-radius: 15px;
@@ -546,8 +551,8 @@ td strong {
   margin: 21px 0;
 }
 .step > span {
-  border: 1px solid #3a4354;
-  color: #bdb4ff;
+  border: 1px solid #57514d;
+  color: var(--accent);
   width: 25px;
   height: 25px;
   flex-shrink: 0;
@@ -578,7 +583,7 @@ td strong {
   height: 19px;
   display: grid;
   place-items: center;
-  border: 1px solid #596578;
+  border: 1px solid #766d66;
   border-radius: 50%;
   font-size: 0.7rem;
   flex-shrink: 0;
@@ -590,10 +595,10 @@ td strong {
 }
 .notice {
   padding: 16px 19px;
-  border: 1px solid #484163;
-  background: #211e30;
+  border: 1px solid #655039;
+  background: #2c251f;
   border-radius: 8px;
-  color: #cec6ec;
+  color: #f0cea8;
   font-size: 0.875rem;
   line-height: 1.6;
   margin-bottom: 22px;
@@ -715,7 +720,7 @@ footer {
   display: flex;
   justify-content: space-between;
   border-top: 1px solid var(--border);
-  color: #7e8ba0;
+  color: #a59d97;
   margin-top: 43px;
   padding: 25px 0;
   gap: 20px;
@@ -725,14 +730,14 @@ footer {
 dialog {
   background: var(--surface);
   color: var(--text);
-  border: 1px solid #46516a;
+  border: 1px solid #57514d;
   border-radius: 14px;
   width: min(600px, calc(100% - 28px));
   padding: 27px;
   max-height: 90vh;
 }
 dialog::backdrop {
-  background: #050810ba;
+  background: #000000ba;
   backdrop-filter: blur(5px);
 }
 .modal-top {
@@ -782,7 +787,7 @@ dialog::backdrop {
   display: block;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  background: #0e141e;
+  background: #151414;
   padding: 17px;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -792,7 +797,7 @@ dialog::backdrop {
 }
 .field-summary {
   padding: 17px;
-  background: #101721;
+  background: #131313;
   border-radius: 8px;
   font-size: 0.875rem;
   line-height: 1.8;
@@ -809,8 +814,8 @@ dialog::backdrop {
   left: 50%;
   transform: translateX(-50%);
   padding: 15px 23px;
-  background: #d8d2ff;
-  color: #141026;
+  background: #f5f2ef;
+  color: #191919;
   box-shadow: 0 8px 40px #0006;
   border-radius: 8px;
   max-width: 90vw;
@@ -865,8 +870,8 @@ dialog::backdrop {
   height: calc(100vh - 32px);
   min-height: 600px;
   margin: 16px;
-  background: #302456;
-  border: 1px solid #69568e;
+  background: #291719;
+  border: 1px solid #683137;
   border-radius: 18px;
   overflow: hidden;
   position: relative;
@@ -874,7 +879,7 @@ dialog::backdrop {
   flex-direction: column;
   justify-content: space-between;
   padding: 45px;
-  color: #b8a6ef;
+  color: #ffc0c3;
 }
 .login-graphic > span {
   font-size: clamp(2.8rem, 6vw, 6rem);
@@ -891,7 +896,7 @@ dialog::backdrop {
 }
 .orbit {
   position: absolute;
-  border: 1px solid #9580c7;
+  border: 1px solid #a14c52;
   border-radius: 50%;
   width: 800px;
   height: 800px;
@@ -910,7 +915,7 @@ dialog::backdrop {
   height: 520px;
   bottom: -160px;
   right: -200px;
-  background: #7564a944;
+  background: #e0182226;
 }
 @media (min-width: 1600px) {
   .fleet-layout {
@@ -1093,4 +1098,14 @@ dialog::backdrop {
   * {
     transition: none !important;
   }
+}
+
+/* Keep keyboard navigation visible on every dark surface. */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+}
+::selection {
+  background: var(--brand);
+  color: #fff;
 }

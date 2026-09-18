@@ -8,8 +8,8 @@
   align-items: center;
   gap: 28px;
   padding: 32px;
-  background: linear-gradient(115deg, #25213e, #161d29);
-  border: 1px solid #403858;
+  background: linear-gradient(115deg, #321c1e, #191919);
+  border: 1px solid var(--accent-border);
   border-radius: 16px;
   margin-bottom: 32px;
 }
@@ -53,10 +53,10 @@
 }
 .service-option:hover {
   border-color: var(--accent);
-  background: #202235;
+  background: var(--accent-soft);
 }
 .service-option > span {
-  color: #afa1ff;
+  color: var(--accent);
   font-family: Consolas, monospace;
   font-size: 0.75rem;
 }
@@ -78,9 +78,9 @@ summary:focus-visible {
 .client-car .book-car {
   margin-top: 22px;
   width: 100%;
-  border-color: #4a4265;
-  color: #cbbfff;
-  background: #27223b;
+  border-color: var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 .appointment-list {
   display: grid;
@@ -118,8 +118,8 @@ summary:focus-visible {
   overflow-wrap: anywhere;
 }
 .appointment-new {
-  color: #d2c7ff;
-  background: #32294b;
+  color: #ffcc91;
+  background: #3c3025;
 }
 .appointment-confirmed,
 .appointment-completed {
@@ -131,11 +131,11 @@ summary:focus-visible {
   background: #20354d;
 }
 .appointment-cancelled {
-  color: #b4bccb;
-  background: #2b2f39;
+  color: #c5bdb7;
+  background: #302c2a;
 }
 .visit-summary {
-  background: #101721;
+  background: #131313;
   border: 1px solid var(--border);
   border-radius: 9px;
   padding: 16px 18px;
@@ -198,7 +198,7 @@ summary:focus-visible {
 }
 .appointment-bottom summary {
   cursor: pointer;
-  color: #bbb0ef;
+  color: #e7babd;
   font-size: 0.8rem;
   padding: 9px 0;
 }
@@ -215,7 +215,7 @@ summary:focus-visible {
   list-style: none;
   margin: 16px 0 0;
   padding: 0 0 0 15px;
-  border-left: 1px solid #4a4265;
+  border-left: 1px solid var(--accent-border);
 }
 .appointment-timeline li {
   padding: 0 0 20px 7px;
@@ -266,8 +266,8 @@ summary:focus-visible {
   margin: 20px 0;
 }
 .request-tabs .selected {
-  color: #d8d0ff;
-  background: #302947;
+  color: #ffcc91;
+  background: #3c3025;
 }
 .previsit {
   display: grid;
@@ -314,7 +314,7 @@ textarea {
   width: 100%;
   font: inherit;
   color: var(--text);
-  background: #101721;
+  background: #131313;
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
