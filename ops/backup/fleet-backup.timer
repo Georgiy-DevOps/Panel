@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily application backup at 03:30 Moscow time
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 Europe/Moscow
+RandomizedDelaySec=10m
+Persistent=true
+Unit=fleet-backup.service
+
+[Install]
+WantedBy=timers.target

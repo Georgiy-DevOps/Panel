@@ -1,0 +1,19 @@
+[Unit]
+Description=Encrypted application backup with verified SQLite restore
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/fleet-backup
+User=root
+UMask=0077
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=4h
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
