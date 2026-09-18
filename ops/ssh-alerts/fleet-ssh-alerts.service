@@ -1,0 +1,38 @@
+[Unit]
+Description=Telegram notifications for successful root SSH logins
+Wants=network-online.target
+After=network-online.target systemd-journald.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=fleet-ssh-alerts
+Group=fleet-ssh-alerts
+SupplementaryGroups=systemd-journal
+ExecStart=/usr/bin/python3 /usr/local/lib/fleet-ssh-alerts/ssh-login-alerts.py
+LoadCredential=telegram.json:/etc/fleet-ssh-alerts/telegram.json
+StateDirectory=fleet-ssh-alerts
+StateDirectoryMode=0700
+UMask=0077
+Restart=always
+RestartSec=5s
+TimeoutStopSec=30s
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target

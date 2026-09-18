@@ -1,0 +1,7 @@
+{
+  "server_name": "Сервер 84.21.173.88",
+  "server_ip": "84.21.173.88",
+  "timezone": "Europe/Moscow",
+  "allowed_users": ["root"],
+  "state_directory": "/var/lib/fleet-ssh-alerts"
+}
