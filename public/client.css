@@ -70,7 +70,7 @@
   font-family: Consolas, monospace;
   font-size: 1rem;
   letter-spacing: 0.035em;
-  color: #d0c6ff;
+  color: #e7ded6;
   overflow-wrap: anywhere;
 }
 .client-service {
@@ -104,30 +104,30 @@
 }
 .pending-message {
   padding: 17px;
-  border: 1px solid #443d62;
-  background: #211e30;
+  border: 1px solid #655039;
+  background: #2c251f;
   border-radius: 7px;
-  color: #cfc5f1;
+  color: #f0cea8;
   font-size: 0.85rem;
   line-height: 1.6;
   margin-top: 25px;
 }
 .client-cars > .empty {
   grid-column: 1/-1;
-  border: 1px dashed #3f495b;
+  border: 1px dashed #57514d;
   border-radius: 12px;
   min-height: 370px;
 }
 .client-link {
-  color: #baacff;
+  color: var(--accent);
   font-size: 0.8rem;
 }
 .client-main footer {
   margin-top: 55px;
 }
 .pill.pending {
-  color: #d5c8ff;
-  background: #322a49;
+  color: #ffcc91;
+  background: #3c3025;
 }
 .pill.linked {
   color: #79e0bc;
