@@ -70,6 +70,10 @@ def read_source(path):
 
 
 def submit():
+    if (SOURCE.parent.parent / ".bundle-mode").exists():
+        import bundle_delivery
+
+        return bundle_delivery.submit(sys.modules[__name__])
     data = read_source(SOURCE)
     source_hash = digest(data)
     with database() as db:
@@ -162,7 +166,7 @@ def sandbox(rid, mode, db_dir=None):
         args += ["--mount", f"type=bind,src={db_dir},dst=/data"]
     args += [config()["image"], "python3", "-B", "/checks/check.py", mode]
     try:
-        command(args, timeout=100)
+        command(args, timeout=600)
     finally:
         subprocess.run(
             ["docker", "rm", "-f", name],
@@ -279,6 +283,10 @@ def replace_live(data):
 def deploy(row):
     rid = row["id"]
     folder = ROOT / rid
+    if (folder / "manifest.json").exists():
+        import bundle_delivery
+
+        return bundle_delivery.deploy(sys.modules[__name__], row)
     data = (folder / "bytedepp_server.py").read_bytes()
     if digest(data) != row["sha"] or digest(LIVE.read_bytes()) != row["base_sha"]:
         raise RuntimeError("Candidate or production changed; submit a fresh version")
@@ -400,7 +408,11 @@ def process_release(bot):
     if row["status"] == "queued":
         set_status(row["id"], "testing")
         try:
-            if (
+            if (ROOT / row["id"] / "manifest.json").exists():
+                import bundle_delivery
+
+                bundle_delivery.verify(ROOT / row["id"], row["sha"])
+            elif (
                 digest((ROOT / row["id"] / "bytedepp_server.py").read_bytes())
                 != row["sha"]
             ):
@@ -417,12 +429,27 @@ def process_release(bot):
             )
             return
         set_status(row["id"], "notifying")
+    scope = "\nОбновляется только server/bytedepp_server.py; APK и каталог не меняются."
+    manifest_path = ROOT / row["id"] / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text())
+        change = manifest["changes"]
+        scope = (
+            "\nНабор: серверный код, каталоги и APK. Файлов: "
+            + str(len(manifest["files"]))
+            + "\nДобавлено: "
+            + str(change["added"])
+            + "; изменено: "
+            + str(change["modified"])
+            + "; удаляется: "
+            + str(change["removed"])
+        )
     message = bot.send(
         "ByteDepp: серверная версия прошла изолированные проверки.\n"
         "Сервер: 84.21.173.88\nSHA256: "
         + row["sha"]
-        + "\nОбновляется только server/bytedepp_server.py; APK и каталог не меняются."
-        "\nПодтверждение действует 24 часа. Обновить рабочий сервер?",
+        + scope
+        + "\nПодтверждение действует 24 часа. Обновить рабочий сервер?",
         [
             {"text": "Обновить", "callback_data": "bd:yes:" + row["id"]},
             {"text": "Отклонить", "callback_data": "bd:no:" + row["id"]},
@@ -445,6 +472,13 @@ def worker():
             "SELECT * FROM releases WHERE status='deploying'"
         ).fetchall()
     for row in interrupted:
+        if (ROOT / row["id"] / "manifest.json").exists():
+            import bundle_delivery
+
+            command(["systemctl", "stop", "bytedepp.service"], timeout=45)
+            bundle_delivery.restore(sys.modules[__name__], ROOT / row["id"])
+            command(["systemctl", "start", "bytedepp.service"], timeout=45)
+            health()
         backup = ROOT / row["id"] / "backup/bytedepp_server.py"
         if backup.exists():
             command(["systemctl", "stop", "bytedepp.service"], timeout=45)
