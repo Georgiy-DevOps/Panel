@@ -11,7 +11,7 @@ select = ['E4', 'E7', 'E9', 'F']
 
 [tool.coverage.run]
 branch = true
-source = ['ops/backup', 'ops/ssh-alerts', 'ops/deploy']
+source = ['ops/backup', 'ops/ssh-alerts', 'ops/deploy', 'ops/bytedepp-delivery']
 omit = ['*/test_*.py']
 
 [tool.coverage.report]

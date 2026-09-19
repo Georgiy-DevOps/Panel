@@ -22,7 +22,12 @@ with tempfile.TemporaryDirectory(prefix="panel-ci-") as directory:
     run("integration/extend_bytedepp.py", str(source))
     env = os.environ | {"BYTEDEPP_SERVER_SOURCE": str(source)}
     run("test/test_bytedepp.py", env=env)
-for directory in ("ops/ssh-alerts", "ops/backup", "ops/deploy"):
+for directory in (
+    "ops/ssh-alerts",
+    "ops/backup",
+    "ops/deploy",
+    "ops/bytedepp-delivery",
+):
     run(
         "-m",
         "coverage",
