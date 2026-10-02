@@ -1,5 +1,5 @@
 black==26.5.1
-ruff==0.16.8
+ruff==0.16.9
 pip-audit==2.10.1
 coverage==7.16.1
 PyJWT[crypto]==2.14.0
