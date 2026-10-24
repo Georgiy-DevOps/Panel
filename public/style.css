@@ -15,6 +15,21 @@
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
   font-size: 16px;
 }
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f3f0;
+  --surface: #ffffff;
+  --surface2: #f0ecf5;
+  --border: #e2dde8;
+  --text: #1a1128;
+  --muted: #6b6679;
+  --brand: #7c3aed;
+  --accent: #6d28d9;
+  --accent-soft: #ede9fe;
+  --accent-border: #c4b5fd;
+  --green: #059669;
+  --red: #dc2626;
+}
 * {
   box-sizing: border-box;
 }
@@ -1212,6 +1227,64 @@ dialog::backdrop {
     flex-direction: column;
   }
 }
+/* Theme toggle */
+.theme-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  margin-bottom: 8px;
+}
+.theme-toggle:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+.theme-icon-light { display: none; }
+.theme-icon-dark { display: inline; }
+[data-theme="light"] .theme-icon-light { display: inline; }
+[data-theme="light"] .theme-icon-dark { display: none; }
+
+/* Light theme adjustments */
+[data-theme="light"] .login-graphic {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 40%, #c4b5fd 100%);
+  color: #4c1d95;
+  border-color: #c4b5fd;
+}
+[data-theme="light"] .login-graphic > span { color: #4c1d95; }
+[data-theme="light"] .login-graphic b { color: #6d28d9; }
+[data-theme="light"] .orbit { border-color: #a78bfa; }
+[data-theme="light"] .o3 { background: rgba(124, 58, 237, 0.1); }
+[data-theme="light"] .sidebar {
+  background: #fff;
+  border-color: var(--border);
+}
+[data-theme="light"] .topbar {
+  background: #fff;
+  border-color: var(--border);
+}
+[data-theme="light"] .kanban-card {
+  background: #fff;
+}
+[data-theme="light"] .funnel-bar .bar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .recent-deals tbody tr:hover,
+[data-theme="light"] .manager-stats tbody tr:hover {
+  background: rgba(124, 58, 237, 0.04);
+}
+[data-theme="light"] .kanban-count {
+  background: rgba(0, 0, 0, 0.08);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;

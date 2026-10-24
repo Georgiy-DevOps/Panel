@@ -272,6 +272,17 @@ $('#logout').onclick = async () => {
     toast(e.message);
   }
 };
+try {
+  const saved = localStorage.getItem('voltcrm-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+} catch {}
+const themeBtn = $('#theme-toggle');
+if (themeBtn) themeBtn.onclick = () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('voltcrm-theme', next); } catch {}
+};
 $('#search').oninput = renderVehicles;
 $('#close-modal').onclick = () => $('#modal').close();
 document.addEventListener('click', (e) => {

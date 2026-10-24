@@ -229,7 +229,7 @@ export async function createApp(config = {}) {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
     );
     if (publicUrl.protocol === 'https:')
       res.setHeader('Strict-Transport-Security', 'max-age=31536000');
@@ -251,7 +251,7 @@ export async function createApp(config = {}) {
         '/style.css': ['style.css', 'text/css'],
         '/favicon.svg': ['favicon.svg', 'image/svg+xml'],
       };
-      for (const file of ['service-catalog.js', 'appointments-ui.js', 'deals-ui.js', 'dashboard-ui.js'])
+      for (const file of ['service-catalog.js', 'appointments-ui.js', 'deals-ui.js', 'dashboard-ui.js', 'theme-init.js'])
         assets['/' + file] = [file, 'text/javascript'];
       assets['/appointments.css'] = ['appointments.css', 'text/css'];
       assets['/deals.css'] = ['deals.css', 'text/css'];
