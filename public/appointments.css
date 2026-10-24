@@ -467,3 +467,58 @@ textarea:focus {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Light theme */
+[data-theme="light"] .appointment-card {
+  background: #fff;
+}
+[data-theme="light"] .appointment-new {
+  color: #92600a;
+  background: #fef3d7;
+}
+[data-theme="light"] .appointment-confirmed,
+[data-theme="light"] .appointment-completed {
+  color: #0a7050;
+  background: #d4f5e9;
+}
+[data-theme="light"] .appointment-in_progress {
+  color: #1a4a8a;
+  background: #dbeafe;
+}
+[data-theme="light"] .appointment-cancelled {
+  color: #6b6679;
+  background: #f0ecf5;
+}
+[data-theme="light"] .visit-summary {
+  background: #f5f3f0;
+}
+[data-theme="light"] .visit-confirmed {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+[data-theme="light"] .visit-confirmed > strong {
+  color: #059669;
+}
+[data-theme="light"] .request-tabs .selected {
+  color: #92600a;
+  background: #fef3d7;
+}
+[data-theme="light"] textarea {
+  background: #f5f3f0;
+}
+[data-theme="light"] .next-visit {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+[data-theme="light"] .next-visit .eyebrow {
+  color: #059669;
+}
+[data-theme="light"] .next-visit p {
+  color: #6b6679;
+}
+[data-theme="light"] .appointment-bottom summary {
+  color: #dc2626;
+}
+[data-theme="light"] .staff-message {
+  border-left-color: var(--accent);
+}

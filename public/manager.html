@@ -3,39 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fleet Panel — Менеджер</title>
+<meta name="theme-color" content="#101010">
+<title>VoltCRM — Менеджер</title>
 <link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/manager.css">
+<script src="/theme-init.js"></script>
 </head>
 <body>
-<div id="app">
-  <div id="login-screen" class="login-screen">
-    <div class="login-box">
-      <h1>👤 Вход для менеджера</h1>
-      <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
-      <input type="password" id="login-password" placeholder="Пароль" autocomplete="current-password" />
-      <button id="login-btn" class="btn btn-primary">Войти</button>
-      <div id="login-error" class="error"></div>
+  <div id="login-screen" class="login-wrap" hidden>
+    <div class="login-card">
+      <div class="brand"><span class="brand-mark">V</span> VOLTCRM</div>
+      <p class="eyebrow">ПОРТАЛ МЕНЕДЖЕРА</p>
+      <h1>Сделки.<br>Заявки.<br>Клиенты.</h1>
+      <p class="muted">Управляйте сделками и заявками клиентов в единой панели.</p>
+      <form id="login-form">
+        <label>Email<input type="email" id="login-email" name="email" required autocomplete="username" /></label>
+        <label>Пароль<input type="password" id="login-password" name="password" required autocomplete="current-password" /></label>
+        <p id="login-error" class="error-text" role="alert"></p>
+        <button id="login-btn" class="primary" type="submit">Войти как менеджер →</button>
+      </form>
+      <a class="admin-link" href="/admin">Вход для администратора ↗</a>
+    </div>
+    <div class="login-graphic" aria-hidden="true">
+      <span>VOLTCRM<br>MANAGER</span>
+      <div class="orbit o1"></div>
+      <div class="orbit o2"></div>
+      <div class="orbit o3"></div>
+      <b>LYNK & CO / ZEEKR</b>
     </div>
   </div>
-  <div id="main-screen" style="display:none">
-    <header class="header">
-      <div class="header-left">
-        <h2>Fleet Panel</h2>
-        <span id="manager-name" class="manager-badge"></span>
+  <div id="main-screen" hidden>
+    <header class="mgr-topbar">
+      <a class="brand" href="/"><span class="brand-mark">V</span> VOLTCRM</a>
+      <nav class="mgr-nav">
+        <button class="mgr-tab active" data-tab="deals">Сделки</button>
+        <button class="mgr-tab" data-tab="appointments">Заявки</button>
+      </nav>
+      <div class="mgr-menu">
+        <span id="manager-name" class="mgr-badge"></span>
+        <button id="mgr-theme-toggle" class="client-theme-toggle" title="Переключить тему">☾</button>
+        <button id="logout-btn" class="mgr-logout">Выйти</button>
       </div>
-      <div class="header-nav">
-        <button class="tab-btn active" data-tab="deals">Сделки</button>
-        <button class="tab-btn" data-tab="appointments">Заявки</button>
-      </div>
-      <button id="logout-btn" class="btn btn-small">Выйти</button>
     </header>
-    <main class="content">
-      <div id="tab-deals" class="tab-content active"></div>
-      <div id="tab-appointments" class="tab-content" style="display:none"></div>
+    <main class="mgr-main">
+      <section class="mgr-hero">
+        <div>
+          <p class="eyebrow">ПАНЕЛЬ МЕНЕДЖЕРА</p>
+          <h1 id="mgr-hero-title">Сделки</h1>
+          <p class="muted" id="mgr-hero-subtitle">Kanban-доска сделок и управление заявками клиентов.</p>
+        </div>
+        <button class="primary" id="mgr-new-deal">＋ Новая сделка</button>
+      </section>
+      <div id="tab-deals" class="mgr-tab-content active"></div>
+      <div id="tab-appointments" class="mgr-tab-content"></div>
     </main>
   </div>
-</div>
 <script type="module" src="/manager.js"></script>
 </body>
 </html>
