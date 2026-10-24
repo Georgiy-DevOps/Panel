@@ -877,15 +877,32 @@ dialog::backdrop {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
+  animation: login-fade 0.6s ease-out;
+}
+@keyframes login-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .login-card {
-  width: 380px;
+  width: 400px;
   max-width: calc(100% - 40px);
   margin: auto;
+  animation: login-slide 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes login-slide {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .login-card > .brand {
   width: 170px;
-  margin-bottom: 70px;
+  margin-bottom: 50px;
+}
+.login-card .eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 600;
 }
 .login-card h1 {
   font-size: 2.6rem;
@@ -896,11 +913,47 @@ dialog::backdrop {
   font-size: 0.9rem;
   margin-bottom: 35px;
 }
+.login-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.login-card label input {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.login-card label input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  outline: none;
+}
 .login-card > .primary {
   width: 100%;
   display: flex;
   justify-content: space-between;
   margin-top: 22px;
+  padding: 14px 20px;
+  font-size: 0.95rem;
+  border-radius: 10px;
+}
+.login-card .admin-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.login-card .admin-link:hover {
+  color: var(--accent);
 }
 .login-note {
   color: var(--muted);
@@ -913,7 +966,7 @@ dialog::backdrop {
   height: calc(100vh - 32px);
   min-height: 600px;
   margin: 16px;
-  background: #1e1236;
+  background: linear-gradient(135deg, #1a0e2e 0%, #1e1236 40%, #0f0a1f 100%);
   border: 1px solid #3d2a6e;
   border-radius: 18px;
   overflow: hidden;
@@ -946,12 +999,18 @@ dialog::backdrop {
   bottom: -300px;
   right: -340px;
   transform: rotate(-25deg);
+  animation: orbit-pulse 4s ease-in-out infinite;
+}
+@keyframes orbit-pulse {
+  0%, 100% { border-color: #5b3d99; }
+  50% { border-color: #7c3aed; }
 }
 .o2 {
   width: 660px;
   height: 660px;
   bottom: -230px;
   right: -270px;
+  animation-delay: 1.3s;
 }
 .o3 {
   width: 520px;
@@ -959,6 +1018,22 @@ dialog::backdrop {
   bottom: -160px;
   right: -200px;
   background: #7c3aed26;
+  animation-delay: 2.6s;
+}
+.login-graphic::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+  top: 30%;
+  left: 20%;
+  border-radius: 50%;
+  animation: glow-float 6s ease-in-out infinite;
+}
+@keyframes glow-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(30px, -20px) scale(1.2); opacity: 0.8; }
 }
 @media (min-width: 1600px) {
   .fleet-layout {

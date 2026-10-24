@@ -547,7 +547,11 @@ export async function createApp(config = {}) {
       const managerUpdate = path.match(/^\/api\/managers\/([0-9a-f-]{36})$/);
       if (managerUpdate && method === 'POST') return send(200, await managers.update(managerUpdate[1], await json(req)));
       // --- Dashboard (admin) ---
-      if (path === '/api/dashboard' && method === 'GET') return send(200, dashboard.stats());
+      if (path === '/api/dashboard' && method === 'GET') {
+        const url = new URL(req.url, 'http://localhost');
+        const period = url.searchParams.get('period') || 'all';
+        return send(200, dashboard.stats(period));
+      }
       // --- Search (admin) ---
       if (path === '/api/search' && method === 'GET') {
         const url = new URL(req.url, 'http://localhost');

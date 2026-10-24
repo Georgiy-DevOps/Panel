@@ -1,5 +1,15 @@
 .dashboard { padding: 0; }
 
+/* Header with search + period tabs */
+.dash-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.dash-header .search-box { flex: 1; min-width: 200px; margin-bottom: 0; }
+
 /* Search box */
 .search-box { position: relative; margin-bottom: 20px; }
 .search-box input {
@@ -60,6 +70,38 @@
 .search-item:last-child { border-bottom: none; }
 .search-item:hover { color: var(--accent); }
 
+/* Period filter tabs */
+.period-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+.period-tabs button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.period-tabs button:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+.period-tabs button.active {
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
 /* Stat cards grid */
 .dash-grid {
   display: grid;
@@ -74,14 +116,24 @@
   padding: 20px 16px;
   text-align: center;
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
 .dash-card:hover {
   border-color: var(--accent-border);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
+.dash-card-accent {
+  border-color: var(--accent-border);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(124, 58, 237, 0.08) 100%);
+}
+.dash-icon {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
 .dash-card .dash-value {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--accent);
   line-height: 1.2;
@@ -167,7 +219,7 @@
   display: flex;
   align-items: flex-end;
   gap: 6px;
-  height: 160px;
+  height: 200px;
   padding-top: 8px;
 }
 .bar-col {
@@ -175,7 +227,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+}
+.bar-col .bar-amount {
+  font-size: 0.55rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .bar-col .bar {
   width: 100%;
@@ -187,12 +245,75 @@
 .bar-col .bar:hover {
   opacity: 0.8;
 }
+.bar-col .bar-count {
+  font-size: 0.65rem;
+  color: var(--accent);
+  font-weight: 600;
+}
 .bar-col .bar-month {
   font-size: 0.65rem;
   color: var(--muted);
-  writing-mode: vertical-lr;
-  transform: rotate(180deg);
-  height: 40px;
+}
+
+/* Conversion ring */
+.conversion-ring {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: center;
+  padding: 10px 0;
+}
+.ring-svg {
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+}
+.ring-progress {
+  transition: stroke-dasharray 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ring-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ring-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+.ring-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Revenue trend chart */
+.revenue-chart {
+  padding: 4px 0;
+}
+.revenue-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.revenue-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px 0;
+}
+.revenue-labels span {
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+.revenue-total {
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Recent deals table */
@@ -238,10 +359,15 @@
 
 /* Mobile */
 @media (max-width: 800px) {
+  .dash-header { flex-direction: column; }
+  .period-tabs { width: 100%; justify-content: center; }
   .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .dash-card { padding: 14px 10px; }
-  .dash-card .dash-value { font-size: 1.3rem; }
+  .dash-card .dash-value { font-size: 1.2rem; }
+  .dash-icon { font-size: 1rem; margin-bottom: 4px; }
   .dash-charts { grid-template-columns: 1fr; }
   .funnel-bar .bar-label { min-width: 70px; font-size: 0.7rem; }
   .funnel-bar .bar-value { min-width: 50px; font-size: 0.7rem; }
+  .conversion-ring { flex-direction: column; }
+  .ring-svg { width: 100px; height: 100px; }
 }
