@@ -12,8 +12,8 @@ export const services = [
     icon: '02',
   },
   {
-    id: 'bytedepp',
-    name: 'Настройка ByteDepp',
+    id: 'setup',
+    name: 'Настройка автомобиля',
     description: 'Русский язык, магазин приложений и помощь с настройками.',
     icon: '03',
   },

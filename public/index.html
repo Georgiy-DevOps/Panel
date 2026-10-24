@@ -87,7 +87,7 @@
               <p class="eyebrow">VOLTCRM</p>
               <h1 id="page-title">Автомобили</h1>
               <p class="muted" id="page-subtitle">
-                Зарегистрированные VIN и связь с устройствами ByteDepp.
+                Зарегистрированные VIN и автомобили клиентов.
               </p>
             </div>
             <div class="page-actions">
@@ -104,8 +104,8 @@
               ><small>VIN в вашей панели</small>
             </article>
             <article>
-              <span>Связаны с ByteDepp</span><strong id="stat-linked">0</strong
-              ><small>устройство подтверждено</small>
+              <span>Подтверждены</span><strong id="stat-linked">0</strong
+              ><small>связь подтверждена</small>
             </article>
             <article>
               <span>Ожидают проверки</span><strong id="stat-pending">0</strong
@@ -139,7 +139,7 @@
                       <tr>
                         <th>Автомобиль / VIN</th>
                         <th>Клиент</th>
-                        <th>Связь с ByteDepp</th>
+                        <th>Статус</th>
                         <th><span class="sr-only">Открыть</span></th>
                       </tr>
                     </thead>
@@ -156,7 +156,7 @@
             <div class="note-strip">
               <span class="note-icon">i</span>
               <p>
-                Регистрация VIN не подтверждает владение автомобилем. Связь с ByteDepp подтверждает
+                Регистрация VIN не подтверждает владение автомобилем. Связь подтверждает
                 администратор после проверки клиента.
               </p>
             </div>
@@ -190,28 +190,6 @@
               /></label>
             </div>
             <div id="admin-appointments" class="appointment-list"></div>
-          </section>
-          <section id="devices-view" hidden>
-            <div class="integration-info">
-              <h2 id="integration-title">Источник ByteDepp</h2>
-              <p id="integration-note"></p>
-            </div>
-            <div class="table-card table-scroll">
-              <table class="admin-device-table">
-                <thead>
-                  <tr>
-                    <th>Устройство</th>
-                    <th>VIN в ByteDepp</th>
-                    <th>Версия системы авто</th>
-                    <th>Русский язык</th>
-                    <th>Магазин</th>
-                    <th>Запись обновлена</th>
-                  </tr>
-                </thead>
-                <tbody id="device-rows"></tbody>
-              </table>
-              <div id="devices-empty" class="empty" hidden></div>
-            </div>
           </section>
           <section id="clients-view" hidden>
             <div class="table-card table-scroll">

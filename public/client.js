@@ -14,7 +14,7 @@ let registering = false,
   pendingService = null;
 const states = {
   pending: 'Ожидает связи',
-  linked: 'Связан с ByteDepp',
+  linked: 'Подтверждён',
   unavailable: 'Данные временно недоступны',
   missing: 'Устройство не найдено',
   mismatch: 'Нужна проверка VIN',
@@ -67,10 +67,10 @@ function render() {
     ? state.vehicles
         .map(
           (v) =>
-            `<article class="client-car"><div class="car-header"><div><span class="vehicle-brand">${esc(v.brand)}</span><h2>${esc(v.model)}</h2></div><span class="pill ${v.link_status}">${states[v.link_status]}</span></div><div class="client-vin">${esc(v.vin)}</div><div class="car-details"><span>Версия системы: ${esc(v.software || 'ещё не передана ByteDepp')}</span>${v.region ? '<span>Регион: ' + esc(v.region) + '</span>' : ''}</div>${v.bytedepp ? service('Русский язык', v.bytedepp.language) + service('Магазин приложений', v.bytedepp.store) : `<div class="pending-message">${v.link_status === 'pending' ? 'VIN зарегистрирован. Связь с ByteDepp ожидает проверки. Запись на сервис уже доступна.' : 'Связь с ByteDepp требует проверки. Запись на сервис доступна.'}</div>`}<button class="book-car" data-book-car="${v.id}">Записать автомобиль →</button></article>`,
+            `<article class="client-car"><div class="car-header"><div><span class="vehicle-brand">${esc(v.brand)}</span><h2>${esc(v.model)}</h2></div><span class="pill ${v.link_status}">${states[v.link_status]}</span></div><div class="client-vin">${esc(v.vin)}</div><div class="car-details"><span>Версия системы: ${esc(v.software || 'нет данных')}</span>${v.region ? '<span>Регион: ' + esc(v.region) + '</span>' : ''}</div>${v.link_status === 'pending' ? `<div class="pending-message">VIN зарегистрирован. Ожидает проверки. Запись на сервис уже доступна.</div>` : ''}<button class="book-car" data-book-car="${v.id}">Записать автомобиль →</button></article>`,
         )
         .join('')
-    : '<div class="empty"><div class="empty-symbol" aria-hidden="true">▦</div><h2>Начните с вашего автомобиля</h2><p>Добавьте VIN, чтобы записаться на обслуживание и подключить сервисы ByteDepp.</p><button class="primary" data-add-vin>＋ Добавить VIN</button></div>';
+    : '<div class="empty"><div class="empty-symbol" aria-hidden="true">▦</div><h2>Начните с вашего автомобиля</h2><p>Добавьте VIN, чтобы записаться на обслуживание.</p><button class="primary" data-add-vin>＋ Добавить VIN</button></div>';
   const next = ordered(state.appointments).find(
     (a) => a.status === 'confirmed' && a.scheduled_at > Date.now(),
   );
