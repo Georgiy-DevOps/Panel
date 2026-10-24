@@ -247,6 +247,20 @@ document.addEventListener('click', (e) => {
   if (b.hasAttribute('data-close-booking')) $('#booking-modal').close();
   if (b.dataset.cancelAppointment) cancelAppointment(b.dataset.cancelAppointment);
 });
+const clientThemeBtn = $('#client-theme-toggle');
+if (clientThemeBtn) {
+  function updateThemeIcon() {
+    clientThemeBtn.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? '☀' : '☾';
+  }
+  updateThemeIcon();
+  clientThemeBtn.onclick = () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('voltcrm-theme', next); } catch {}
+    updateThemeIcon();
+  };
+}
 $('#logout-client').onclick = async () => {
   try {
     await api('/logout', {});
