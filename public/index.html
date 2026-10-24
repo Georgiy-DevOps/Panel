@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" href="/client.css" />
     <link rel="stylesheet" href="/appointments.css" />
+    <link rel="stylesheet" href="/deals.css" />
+    <link rel="stylesheet" href="/dashboard.css" />
     <script type="module" src="/app.js"></script>
   </head>
   <body>
@@ -48,6 +50,10 @@
         <nav aria-label="Разделы панели">
           <button class="nav-item active" data-view="vehicles">
             <span aria-hidden="true">▦</span>Автомобили <small id="nav-count">0</small></button
+          ><button class="nav-item" data-view="dashboard">
+            <span aria-hidden="true">◉</span>Dashboard</button
+          ><button class="nav-item" data-view="deals">
+            <span aria-hidden="true">◈</span>Сделки <small id="nav-deals">0</small></button
           ><button class="nav-item" data-view="appointments">
             <span aria-hidden="true">◷</span>Запись на сервис
             <small id="nav-appointments">0</small></button
@@ -55,6 +61,8 @@
             <span aria-hidden="true">⌘</span>ByteDepp</button
           ><button class="nav-item" data-view="clients">
             <span aria-hidden="true">♙</span>Клиенты</button
+          ><button class="nav-item" data-view="managers">
+            <span aria-hidden="true">♛</span>Менеджеры</button
           ><button class="nav-item" data-view="history">
             <span aria-hidden="true">◷</span>Журнал
           </button>
@@ -223,6 +231,18 @@
               </table>
               <div id="clients-empty" class="empty" hidden></div>
             </div>
+          </section>
+          <section id="dashboard-view" hidden>
+            <div class="section-heading"><h2>Dashboard</h2><span class="muted">Обзор бизнеса</span></div>
+            <div id="dashboard-container"></div>
+          </section>
+          <section id="deals-view" hidden>
+            <div class="section-heading"><h2>Сделки</h2><span class="muted">Kanban-доска</span></div>
+            <div id="deals-container"></div>
+          </section>
+          <section id="managers-view" hidden>
+            <div class="section-heading"><h2>Менеджеры</h2><span class="muted">Управление командой</span></div>
+            <div id="managers-container"></div>
           </section>
           <section id="history-view" hidden>
             <div class="section-heading">

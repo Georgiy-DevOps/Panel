@@ -1,0 +1,35 @@
+.kanban-board{display:flex;gap:12px;overflow-x:auto;padding:12px 0;min-height:400px}
+.kanban-column{min-width:260px;max-width:300px;flex:1;background:var(--surface);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.kanban-column-header{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;font-weight:600;font-size:.85rem;color:#fff}
+.kanban-column-header .count{background:rgba(255,255,255,.25);border-radius:12px;padding:1px 8px;font-size:.75rem}
+.kanban-cards{display:flex;flex-direction:column;gap:6px;flex:1;min-height:60px}
+.kanban-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:box-shadow .15s}
+.kanban-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.kanban-card .deal-title{font-weight:600;font-size:.85rem;margin-bottom:4px}
+.kanban-card .deal-client{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+.kanban-card .deal-amount{font-size:.8rem;font-weight:500;color:var(--accent)}
+.kanban-card .deal-priority{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.kanban-card .deal-priority.p0{background:#94a3b8}
+.kanban-card .deal-priority.p1{background:#f59e0b}
+.kanban-card .deal-priority.p2{background:#ef4444}
+.deal-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000}
+.deal-modal{background:var(--bg);border-radius:12px;padding:24px;width:90%;max-width:500px;max-height:85vh;overflow-y:auto}
+.deal-modal h3{margin:0 0 16px}
+.deal-modal label{display:block;font-size:.8rem;font-weight:500;margin:8px 0 4px;color:var(--muted)}
+.deal-modal input,.deal-modal select,.deal-modal textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;background:var(--surface);color:var(--text)}
+.deal-modal textarea{min-height:60px;resize:vertical}
+.deal-modal .deal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.deal-history{margin-top:12px;font-size:.75rem;max-height:150px;overflow-y:auto}
+.deal-history-item{padding:4px 0;border-bottom:1px solid var(--border)}
+.deal-history-item .field{font-weight:500;color:var(--accent)}
+.deals-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.deals-filters input,.deals-filters select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;background:var(--surface);color:var(--text)}
+.deals-filters input{flex:1;min-width:180px}
+.deals-filters .btn{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);cursor:pointer;font-size:.85rem}
+.deals-filters .btn:hover{background:var(--border)}
+.deals-filters .btn-primary,.deal-modal .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.85rem}
+.deals-filters .btn-primary:hover,.deal-modal .btn-primary:hover{opacity:.9}
+.deal-modal .btn{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);cursor:pointer;font-size:.85rem}
+.deal-modal .btn:hover{background:var(--border)}
+.deal-modal .btn-danger{background:#ef4444;border-color:#ef4444;color:#fff}
+.deal-modal .btn-danger:hover{opacity:.9}

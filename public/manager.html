@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fleet Panel — Менеджер</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/manager.css">
+</head>
+<body>
+<div id="app">
+  <div id="login-screen" class="login-screen">
+    <div class="login-box">
+      <h1>👤 Вход для менеджера</h1>
+      <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
+      <input type="password" id="login-password" placeholder="Пароль" autocomplete="current-password" />
+      <button id="login-btn" class="btn btn-primary">Войти</button>
+      <div id="login-error" class="error"></div>
+    </div>
+  </div>
+  <div id="main-screen" style="display:none">
+    <header class="header">
+      <div class="header-left">
+        <h2>Fleet Panel</h2>
+        <span id="manager-name" class="manager-badge"></span>
+      </div>
+      <div class="header-nav">
+        <button class="tab-btn active" data-tab="deals">Сделки</button>
+        <button class="tab-btn" data-tab="appointments">Заявки</button>
+      </div>
+      <button id="logout-btn" class="btn btn-small">Выйти</button>
+    </header>
+    <main class="content">
+      <div id="tab-deals" class="tab-content active"></div>
+      <div id="tab-appointments" class="tab-content" style="display:none"></div>
+    </main>
+  </div>
+</div>
+<script type="module" src="/manager.js"></script>
+</body>
+</html>

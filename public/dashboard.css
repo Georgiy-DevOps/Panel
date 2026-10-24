@@ -1,0 +1,33 @@
+.dashboard{padding:0}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.dash-card{background:var(--surface);border-radius:10px;padding:16px;text-align:center}
+.dash-card .dash-value{font-size:1.8rem;font-weight:700;color:var(--accent);line-height:1.2}
+.dash-card .dash-label{font-size:.75rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.dash-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:20px}
+.dash-chart{background:var(--surface);border-radius:10px;padding:16px}
+.dash-chart h4{margin:0 0 12px;font-size:.9rem;font-weight:600}
+.funnel-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.funnel-bar .bar-label{min-width:100px;font-size:.8rem;text-align:right}
+.funnel-bar .bar-track{flex:1;height:24px;background:var(--border);border-radius:4px;overflow:hidden;position:relative}
+.funnel-bar .bar-fill{height:100%;border-radius:4px;transition:width .3s;display:flex;align-items:center;justify-content:flex-end;padding:0 6px;font-size:.7rem;color:#fff;font-weight:600;min-width:fit-content}
+.funnel-bar .bar-value{min-width:60px;font-size:.8rem;text-align:right}
+.recent-deals{max-height:300px;overflow-y:auto}
+.recent-deals table{width:100%;border-collapse:collapse;font-size:.8rem}
+.recent-deals th,.recent-deals td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.recent-deals th{font-weight:600;color:var(--muted);text-transform:uppercase;font-size:.7rem;letter-spacing:.5px}
+.stage-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;color:#fff;font-weight:500}
+.manager-stats table{width:100%;border-collapse:collapse;font-size:.8rem}
+.manager-stats th,.manager-stats td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding-top:8px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-col .bar{width:100%;border-radius:4px 4px 0 0;background:var(--accent);transition:height .3s}
+.bar-col .bar-month{font-size:.65rem;color:var(--muted);writing-mode:vertical-lr;transform:rotate(180deg);height:40px}
+.search-box{position:relative;margin-bottom:16px}
+.search-box input{width:100%;padding:10px 14px 10px 36px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface);color:var(--text)}
+.search-box .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1.1rem}
+.search-results{background:var(--surface);border:1px solid var(--border);border-radius:8px;max-height:400px;overflow-y:auto;display:none}
+.search-results.active{display:block}
+.search-group{padding:8px 12px}
+.search-group-title{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.search-item{padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;font-size:.85rem}
+.search-item:hover{color:var(--accent)}

@@ -14,6 +14,10 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readByteDepp } from './bytedepp.mjs';
 import { createAppointments } from './appointments.mjs';
+import { createDeals, dealStages, dealStageIds } from './deals.mjs';
+import { createManagers } from './managers.mjs';
+import { createDashboard } from './dashboard.mjs';
+import { createNotifier } from './telegram.mjs';
 
 const scrypt = promisify(scryptCallback),
   here = dirname(fileURLToPath(import.meta.url));
@@ -97,7 +101,11 @@ export async function createApp(config = {}) {
       target,
       now(),
     );
+  const notifier = createNotifier();
   const appointments = createAppointments(db, audit);
+  const managers = createManagers(db, audit, cookie);
+  const deals = createDeals(db, audit, (event, data) => notifier.send(event, data));
+  const dashboard = createDashboard(db);
   function selectedClient(value) {
     if (value === undefined || value === null || value === '') return null;
     const account = one('SELECT id,email FROM clients WHERE id=?', field(value, 'Клиент', 36));
@@ -243,9 +251,14 @@ export async function createApp(config = {}) {
         '/style.css': ['style.css', 'text/css'],
         '/favicon.svg': ['favicon.svg', 'image/svg+xml'],
       };
-      for (const file of ['service-catalog.js', 'appointments-ui.js'])
+      for (const file of ['service-catalog.js', 'appointments-ui.js', 'deals-ui.js', 'dashboard-ui.js'])
         assets['/' + file] = [file, 'text/javascript'];
       assets['/appointments.css'] = ['appointments.css', 'text/css'];
+      assets['/deals.css'] = ['deals.css', 'text/css'];
+      assets['/dashboard.css'] = ['dashboard.css', 'text/css'];
+      assets['/manager'] = ['manager.html', 'text/html'];
+      assets['/manager.js'] = ['manager.js', 'text/javascript'];
+      assets['/manager.css'] = ['manager.css', 'text/css'];
       if (assets[path] && method === 'GET') {
         const [file, type] = assets[path];
         res.setHeader('Content-Type', type + '; charset=utf-8');
@@ -379,6 +392,8 @@ export async function createApp(config = {}) {
           appointments: appointments.list(),
           events: all('SELECT * FROM events ORDER BY id DESC LIMIT 100'),
           bytedepp: byte,
+          managers: managers.list(),
+          dealCount: one('SELECT count(*) AS c FROM deals WHERE stage NOT IN ("won","lost")')?.c || 0,
           server: { time: now(), public_url: publicUrl.origin },
         });
       }
@@ -467,6 +482,87 @@ export async function createApp(config = {}) {
         audit('admin', 'Связь с ByteDepp снята', v.vin);
         return send(200, { ok: true });
       }
+      // --- Manager auth ---
+      if (path === '/api/manager/login' && method === 'POST') {
+        origin(req);
+        const result = await managers.login(await json(req), remoteIp(req), limit, res);
+        return send(200, result);
+      }
+      // --- Manager portal ---
+      if (path.startsWith('/api/manager/')) {
+        if (!['GET', 'HEAD'].includes(method)) origin(req);
+        const mgr = managers.auth(req);
+        if (path === '/api/manager/logout' && method === 'POST') {
+          managers.logout(req);
+          res.setHeader('Set-Cookie', cookie('fleet_manager_session', '', 0));
+          return send(200, { ok: true });
+        }
+        if (path === '/api/manager/state' && method === 'GET') {
+          const perms = JSON.parse(mgr.permissions || '{}');
+          return send(200, {
+            manager: { id: mgr.id, name: mgr.name, email: mgr.email, permissions: perms },
+            deals: perms.deals ? deals.list({ manager_id: mgr.id }) : [],
+            appointments: perms.appointments ? appointments.list() : [],
+            dealStages,
+          });
+        }
+        if (path === '/api/manager/deals' && method === 'GET') {
+          return send(200, deals.list({ manager_id: mgr.id }));
+        }
+        if (path === '/api/manager/deals' && method === 'POST') {
+          const b = await json(req);
+          b.manager_id = mgr.id;
+          return send(201, deals.create(b, 'manager:' + mgr.email));
+        }
+        const mgrDealUpdate = path.match(/^\/api\/manager\/deals\/([0-9a-f-]{36})$/);
+        if (mgrDealUpdate && method === 'POST') {
+          return send(200, deals.update(mgrDealUpdate[1], await json(req), 'manager:' + mgr.email));
+        }
+        fail(404, 'Метод не найден');
+      }
+      // --- Deals (admin) ---
+      if (path === '/api/deals' && method === 'GET') {
+        const url = new URL(req.url, 'http://localhost');
+        return send(200, deals.list({
+          stage: url.searchParams.get('stage') || undefined,
+          manager_id: url.searchParams.get('manager_id') || undefined,
+          client_id: url.searchParams.get('client_id') || undefined,
+          search: url.searchParams.get('q') || undefined,
+        }));
+      }
+      if (path === '/api/deals/kanban' && method === 'GET')
+        return send(200, { board: deals.kanban(), stages: dealStages });
+      if (path === '/api/deals/stats' && method === 'GET')
+        return send(200, deals.stats());
+      if (path === '/api/deals' && method === 'POST')
+        return send(201, deals.create(await json(req), 'admin'));
+      const dealGet = path.match(/^\/api\/deals\/([0-9a-f-]{36})$/);
+      if (dealGet && method === 'GET') return send(200, deals.get(dealGet[1]));
+      if (dealGet && method === 'POST') return send(200, deals.update(dealGet[1], await json(req), 'admin'));
+      const dealDelete = path.match(/^\/api\/deals\/([0-9a-f-]{36})\/delete$/);
+      if (dealDelete && method === 'POST') return send(200, deals.remove(dealDelete[1]));
+      // --- Managers (admin) ---
+      if (path === '/api/managers' && method === 'GET') return send(200, managers.list());
+      if (path === '/api/managers' && method === 'POST') return send(201, await managers.create(await json(req)));
+      const managerUpdate = path.match(/^\/api\/managers\/([0-9a-f-]{36})$/);
+      if (managerUpdate && method === 'POST') return send(200, await managers.update(managerUpdate[1], await json(req)));
+      // --- Dashboard (admin) ---
+      if (path === '/api/dashboard' && method === 'GET') return send(200, dashboard.stats());
+      // --- Search (admin) ---
+      if (path === '/api/search' && method === 'GET') {
+        const url = new URL(req.url, 'http://localhost');
+        const q = url.searchParams.get('q') || '';
+        if (!q || q.length < 2) return send(200, { clients: [], vehicles: [], deals: [] });
+        const term = '%' + q + '%';
+        return send(200, {
+          clients: all('SELECT id,email,name,created_at FROM clients WHERE name LIKE ? OR email LIKE ? LIMIT 20', term, term),
+          vehicles: all('SELECT id,vin,brand,model,created_at FROM vehicles WHERE vin LIKE ? OR brand LIKE ? OR model LIKE ? LIMIT 20', term, term, term),
+          deals: all('SELECT id,title,stage,amount,updated_at FROM deals WHERE title LIKE ? OR description LIKE ? LIMIT 20', term, term),
+        });
+      }
+      // --- Telegram config (admin) ---
+      if (path === '/api/telegram/status' && method === 'GET')
+        return send(200, { enabled: notifier.enabled });
       fail(404, 'Метод не найден');
     } catch (error) {
       if (res.headersSent || res.destroyed) {

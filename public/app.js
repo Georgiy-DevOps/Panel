@@ -1,5 +1,7 @@
 import { statuses, transitions, activeStatuses, moscowDate } from './service-catalog.js';
 import { appointmentCard, serviceName, preferred } from './appointments-ui.js';
+import { initDeals } from './deals-ui.js';
+import { initDashboard } from './dashboard-ui.js';
 const $ = (s) => document.querySelector(s),
   esc = (v) =>
     String(v ?? '').replace(
@@ -83,6 +85,7 @@ function render() {
   $('#stat-linked').textContent = state.vehicles.filter((v) => v.link_status === 'linked').length;
   $('#stat-pending').textContent = state.vehicles.filter((v) => v.link_status !== 'linked').length;
   $('#stat-clients').textContent = state.clients.length;
+  $('#nav-deals').textContent = state.dealCount || 0;
   renderVehicles();
   renderAppointments();
   $('#integration-title').textContent = state.bytedepp.connected
@@ -162,11 +165,14 @@ function renderVehicles() {
 function setView(next) {
   view = next;
   const names = {
+    dashboard: ['Dashboard', 'Обзор бизнеса: клиенты, сделки, заявки, воронка.'],
+    deals: ['Сделки', 'Kanban-доска сделок и воронка продаж.'],
     vehicles: ['Автомобили', 'Зарегистрированные VIN и связь с устройствами ByteDepp.'],
     appointments: [
       'Запись на сервис',
       'Заявки клиентов на ТО, диагностику, настройку ByteDepp и консультацию.',
     ],
+    managers: ['Менеджеры', 'Управление командой и правами доступа.'],
     devices: ['Устройства ByteDepp', 'Русский язык и магазин приложений на действующем сервере.'],
     clients: ['Клиенты', 'Личные кабинеты и зарегистрированные автомобили.'],
     history: ['Журнал', 'Регистрация автомобилей, сервисные заявки и связи с ByteDepp.'],
@@ -180,6 +186,9 @@ function setView(next) {
   $('#breadcrumb-current').textContent = names[view][0];
   $('#page-subtitle').textContent = names[view][1];
   $('#add-vehicle').hidden = view !== 'vehicles';
+  if (view === 'dashboard' && dashboardUI) dashboardUI.reload();
+  if (view === 'deals' && dealsUI) dealsUI.reload();
+  if (view === 'managers') renderManagers();
 }
 function modal(title, html) {
   $('#modal-title').textContent = title;
@@ -433,7 +442,67 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-manage-appointment]');
   if (b) manageAppointment(b.dataset.manageAppointment);
 });
-refresh();
+let dashboardUI, dealsUI;
+async function apiGet(url, opts) {
+  const r = await fetch(url, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'Ошибка');
+  return data;
+}
+function initCrmModules() {
+  if (!dashboardUI) dashboardUI = initDashboard($('#dashboard-container'), apiGet);
+  if (!dealsUI) dealsUI = initDeals($('#deals-container'), apiGet);
+  renderManagers();
+}
+async function renderManagers() {
+  const container = $('#managers-container');
+  if (!container) return;
+  try {
+    const list = await apiGet('/api/managers');
+    container.innerHTML = `
+      <button class="primary" id="add-manager-btn" style="margin-bottom:12px">＋ Добавить менеджера</button>
+      <div class="table-card"><div class="table-scroll"><table>
+        <thead><tr><th>Имя</th><th>Email</th><th>Права</th><th>Статус</th><th></th></tr></thead>
+        <tbody>${list.map(m => `<tr>
+          <td>${esc(m.name)}</td><td>${esc(m.email)}</td>
+          <td style="font-size:.75rem">${Object.entries(JSON.parse(m.permissions || '{}')).filter(([,v])=>v).map(([k])=>k).join(', ') || '—'}</td>
+          <td><span class="pill ${m.active ? 'ready' : ''}">${m.active ? 'Активен' : 'Отключён'}</span></td>
+          <td><button class="edit-mgr" data-id="${m.id}" style="font-size:.75rem;cursor:pointer;background:none;border:1px solid var(--border);padding:2px 8px;border-radius:4px">✎</button></td>
+        </tr>`).join('') || '<tr><td colspan="5" class="muted">Менеджеров пока нет</td></tr>'}</tbody>
+      </table></div></div>`;
+    container.querySelector('#add-manager-btn')?.addEventListener('click', () => showManagerModal());
+    container.querySelectorAll('.edit-mgr').forEach(btn => {
+      btn.onclick = () => {
+        const m = list.find(x => x.id === btn.dataset.id);
+        if (m) showManagerModal(m);
+      };
+    });
+  } catch { container.innerHTML = '<p class="muted">Не удалось загрузить менеджеров</p>'; }
+}
+function showManagerModal(mgr) {
+  const perms = mgr ? JSON.parse(mgr.permissions || '{}') : { deals: true, appointments: true, clients: false };
+  modal(mgr ? 'Редактировать менеджера' : 'Новый менеджер', `
+    <form>
+      <label>Имя<input name="name" value="${esc(mgr?.name || '')}" required></label>
+      <label>Email<input name="email" type="email" value="${esc(mgr?.email || '')}" required ${mgr ? 'disabled' : ''}></label>
+      ${mgr ? '' : '<label>Пароль<input name="password" type="password" minlength="8" required></label>'}
+      <label class="checkbox-wrap"><input type="checkbox" name="deals" ${perms.deals ? 'checked' : ''}> Сделки</label>
+      <label class="checkbox-wrap"><input type="checkbox" name="appointments" ${perms.appointments ? 'checked' : ''}> Заявки</label>
+      <label class="checkbox-wrap"><input type="checkbox" name="clients" ${perms.clients ? 'checked' : ''}> Клиенты</label>
+      ${mgr ? `<label class="checkbox-wrap"><input type="checkbox" name="active" ${mgr.active ? 'checked' : ''}> Активен</label>` : ''}
+      ${formEnd('Сохранить')}
+    </form>`);
+  handleForm(async (d) => {
+    const body = {
+      name: d.name,
+      permissions: { deals: 'deals' in d, appointments: 'appointments' in d, clients: 'clients' in d },
+    };
+    if (!mgr) { body.email = d.email; body.password = d.password; }
+    if (mgr) body.active = 'active' in d;
+    await api('/managers' + (mgr ? '/' + mgr.id : ''), body);
+  }, mgr ? 'Менеджер обновлён' : 'Менеджер создан');
+}
+refresh().then(() => initCrmModules());
 setInterval(() => {
   if (!$('#app').hidden && !document.hidden) refresh();
 }, 10000);
