@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#101010" />
-    <title>ByteDepp — панель администратора</title>
+    <title>VoltCRM — панель администратора</title>
     <meta
       name="description"
-      content="Панель администратора ByteDepp: клиенты, VIN и связь с устройствами."
+      content="VoltCRM: клиенты, автомобили, сделки и сервис."
     />
     <link rel="icon" href="/favicon.svg" />
     <link rel="stylesheet" href="/style.css" />
@@ -20,10 +20,10 @@
   <body>
     <div id="login-view" class="login-wrap" hidden>
       <form id="login-form" class="login-card">
-        <div class="brand"><span class="brand-mark">B</span> BYTEDEPP</div>
+        <div class="brand"><span class="brand-mark">V</span> VOLTCRM</div>
         <p class="eyebrow">ПАНЕЛЬ АДМИНИСТРАТОРА</p>
-        <h1>Клиенты.<br />Автомобили.<br />ByteDepp.</h1>
-        <p class="muted">Управление связями между клиентскими VIN и устройствами ByteDepp.</p>
+        <h1>Клиенты.<br />Автомобили.<br />Сделки.</h1>
+        <p class="muted">CRM-система для управления клиентами, автомобилями и продажами.</p>
         <label
           >Пароль администратора<input
             type="password"
@@ -36,7 +36,7 @@
         ><a class="admin-link" href="/client">Перейти в кабинет клиента ↗</a>
       </form>
       <div class="login-graphic" aria-hidden="true">
-        <span>BYTEDEPP<br />CONTROL</span>
+        <span>VOLTCRM<br />CONTROL</span>
         <div class="orbit o1"></div>
         <div class="orbit o2"></div>
         <div class="orbit o3"></div>
@@ -45,7 +45,7 @@
     </div>
     <div id="app" hidden>
       <aside class="sidebar">
-        <a class="brand" href="/admin"><span class="brand-mark">B</span> BYTEDEPP</a>
+        <a class="brand" href="/admin"><span class="brand-mark">V</span> VOLTCRM</a>
         <p class="nav-caption">УПРАВЛЕНИЕ</p>
         <nav aria-label="Разделы панели">
           <button class="nav-item active" data-view="vehicles">
@@ -57,8 +57,6 @@
           ><button class="nav-item" data-view="appointments">
             <span aria-hidden="true">◷</span>Запись на сервис
             <small id="nav-appointments">0</small></button
-          ><button class="nav-item" data-view="devices">
-            <span aria-hidden="true">⌘</span>ByteDepp</button
           ><button class="nav-item" data-view="clients">
             <span aria-hidden="true">♙</span>Клиенты</button
           ><button class="nav-item" data-view="managers">
@@ -69,14 +67,13 @@
         </nav>
         <div class="sidebar-foot">
           <div class="supported">LYNK & CO<br /><strong>ZEEKR</strong></div>
-          <div id="server-status" class="server-status">Соединение…</div>
           <button id="logout" class="logout">Выйти из панели ↗</button>
         </div>
       </aside>
       <main>
         <header class="topbar">
           <div>
-            <span class="breadcrumb">ByteDepp Control</span><span class="slash">/</span
+            <span class="breadcrumb">VoltCRM</span><span class="slash">/</span
             ><span id="breadcrumb-current">Автомобили</span>
           </div>
           <span class="admin-badge"><span>A</span>Администратор</span>
@@ -87,7 +84,7 @@
           </div>
           <section class="page-title">
             <div>
-              <p class="eyebrow">BYTEDEPP CONTROL</p>
+              <p class="eyebrow">VOLTCRM</p>
               <h1 id="page-title">Автомобили</h1>
               <p class="muted" id="page-subtitle">
                 Зарегистрированные VIN и связь с устройствами ByteDepp.
@@ -252,7 +249,7 @@
             <div id="event-list" class="events"></div>
           </section>
           <footer>
-            <span>BYTEDEPP CONTROL</span><span>LYNK & CO · ZEEKR</span
+            <span>VOLTCRM</span><span>LYNK & CO · ZEEKR</span
             ><span id="last-refresh"></span>
           </footer>
         </div>
