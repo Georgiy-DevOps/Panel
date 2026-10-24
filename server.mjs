@@ -103,7 +103,6 @@ export async function createApp(config = {}) {
     );
   const notifier = createNotifier();
   const appointments = createAppointments(db, audit);
-  const managers = createManagers(db, audit, cookie);
   const deals = createDeals(db, audit, (event, data) => notifier.send(event, data));
   const dashboard = createDashboard(db);
   function selectedClient(value) {
@@ -162,6 +161,7 @@ export async function createApp(config = {}) {
       ?.slice(name.length + 1);
   const cookie = (name, value, age) =>
     `${name}=${value}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${publicUrl.protocol === 'https:' ? '; Secure' : ''}`;
+  const managers = createManagers(db, audit, cookie);
   function admin(req) {
     const raw = cookieValue(req, 'fleet_session');
     if (!raw || !one('SELECT hash FROM sessions WHERE hash=? AND expires>?', sha(raw), now()))
@@ -393,7 +393,7 @@ export async function createApp(config = {}) {
           events: all('SELECT * FROM events ORDER BY id DESC LIMIT 100'),
           bytedepp: byte,
           managers: managers.list(),
-          dealCount: one('SELECT count(*) AS c FROM deals WHERE stage NOT IN ("won","lost")')?.c || 0,
+          dealCount: one("SELECT count(*) AS c FROM deals WHERE stage NOT IN ('won','lost')")?.c || 0,
           server: { time: now(), public_url: publicUrl.origin },
         });
       }
@@ -569,7 +569,7 @@ export async function createApp(config = {}) {
         if (!res.destroyed) res.destroy();
         return;
       }
-      if (!error.status) console.error('Request failed:', error.code || error.name);
+      if (!error.status) console.error('Request failed:', error.code || error.name, error.message);
       send(error.status || 500, {
         error: error.status ? error.message : 'Ошибка сервера. Повторите запрос.',
       });

@@ -1,18 +1,17 @@
 :root {
   color-scheme: dark;
-  --bg: #101010;
-  --surface: #191919;
-  --surface2: #242323;
-  --border: #383534;
+  --bg: #110b1a;
+  --surface: #1a1128;
+  --surface2: #231836;
+  --border: #362b4d;
   --text: #f5f2ef;
   --muted: #b0aaa5;
-  /* ByteDepp brand red; brighter accent for text on dark surfaces. */
-  --brand: #e01822;
-  --accent: #ff737b;
-  --accent-soft: #301d20;
-  --accent-border: #794249;
+  --brand: #7c3aed;
+  --accent: #a78bfa;
+  --accent-soft: #1e1236;
+  --accent-border: #5b3d99;
   --green: #66d8b4;
-  --red: #ff9d9d;
+  --red: #f87171;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
   font-size: 16px;
 }
@@ -68,7 +67,7 @@ button.primary {
   white-space: nowrap;
 }
 button.primary:hover {
-  background: #c8141e;
+  background: #6d28d9;
 }
 input,
 select {
@@ -881,8 +880,8 @@ dialog::backdrop {
   height: calc(100vh - 32px);
   min-height: 600px;
   margin: 16px;
-  background: #291719;
-  border: 1px solid #683137;
+  background: #1e1236;
+  border: 1px solid #3d2a6e;
   border-radius: 18px;
   overflow: hidden;
   position: relative;
@@ -890,7 +889,7 @@ dialog::backdrop {
   flex-direction: column;
   justify-content: space-between;
   padding: 45px;
-  color: #ffc0c3;
+  color: #c4b5fd;
 }
 .login-graphic > span {
   font-size: clamp(2.8rem, 6vw, 6rem);
@@ -907,7 +906,7 @@ dialog::backdrop {
 }
 .orbit {
   position: absolute;
-  border: 1px solid #a14c52;
+  border: 1px solid #5b3d99;
   border-radius: 50%;
   width: 800px;
   height: 800px;
@@ -926,7 +925,7 @@ dialog::backdrop {
   height: 520px;
   bottom: -160px;
   right: -200px;
-  background: #e0182226;
+  background: #7c3aed26;
 }
 @media (min-width: 1600px) {
   .fleet-layout {
